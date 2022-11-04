@@ -1,0 +1,93 @@
+<script lang="ts">
+	import { scale } from 'svelte/transition';
+	import { clickOutside } from '$lib/actions/clickOutside';
+	import type { SearchResult } from '$lib/data/decoders/SearchResult';
+	import type { MaybeNumber } from '$lib/data/types/Maybes';
+	import TextInput from '$lib/components/TextInput.svelte';
+	import SearchIcon from '$lib/components/icons/Search.svelte';
+	import { fmpKey } from '$lib/store/fmp';
+
+	let keywords = '';
+	let timer: ReturnType<typeof setTimeout>;
+	let results: SearchResult[] = [];
+	let highlightedIndex: MaybeNumber = null;
+	let hide = false;
+
+	$: keywords.length > -1 && handleInputChange();
+
+	const handleInputChange = () => {
+		if (keywords.length === 0) {
+			results = [];
+			return;
+		}
+
+		clearTimeout(timer);
+		timer = setTimeout(async () => {
+			if (keywords.length > 0) {
+				const url = `/api/ticker-search?keywords=${keywords}&fmpKey=${$fmpKey}`;
+				const response = await fetch(url);
+				results = await response.json();
+				highlightedIndex = null;
+				hide = false;
+			}
+		}, 300);
+	};
+
+	const handleKeydown = (event: KeyboardEvent) => {
+		const { key } = event;
+
+		if (key === 'Escape') {
+			keywords = '';
+		} else if (key === 'ArrowUp') {
+			// up
+			highlightedIndex = highlightedIndex ? highlightedIndex - 1 : results.length - 1;
+		} else if (key === 'ArrowDown') {
+			highlightedIndex =
+				highlightedIndex === null || highlightedIndex === results.length - 1
+					? 0
+					: highlightedIndex + 1;
+		} else if (key === 'Enter' && highlightedIndex !== null) {
+			// TODO: handle enter
+		}
+	};
+</script>
+
+<div class="relative" on:click={() => (hide = false)} on:keydown={handleKeydown}>
+	<TextInput
+		id="ticker-search"
+		label="Search: e.g. Apple or AAPL"
+		bind:value={keywords}
+		icon={SearchIcon}
+		isWide={true} />
+
+	{#if results.length > 0 && !hide}
+		<div
+			use:clickOutside={() => (hide = true)}
+			in:scale={{ duration: 100, start: 0.95 }}
+			out:scale={{ duration: 75, start: 0.95 }}
+			class="absolute left-0 top-12 right-0 z-20 overflow-hidden rounded-md bg-white shadow dark:bg-gray-600">
+			<ul class="divide-y divide-gray-200">
+				{#each results as r, i}
+					<li
+						class={`${
+							highlightedIndex === i && 'bg-indigo-50 dark:bg-gray-700'
+						} flex py-4 hover:bg-indigo-50 dark:hover:bg-gray-700`}>
+						<span class="w-full cursor-pointer">
+							<div class="ml-3">
+								<p class="text text-gray-900 dark:text-gray-100">
+									<span class="font-medium">
+										{r.symbol}
+									</span>
+									| {r.exchangeShortName}
+								</p>
+								<p class="text-xs text-gray-700 dark:text-gray-300">
+									{r.name}
+								</p>
+							</div>
+						</span>
+					</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
+</div>
