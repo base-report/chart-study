@@ -6,6 +6,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import SearchIcon from '$lib/components/icons/Search.svelte';
 	import { fmpKey } from '$lib/store/fmp';
+	import { alert, resetAlert } from '$lib/store/alert';
 
 	let keywords = '';
 	let timer: ReturnType<typeof setTimeout>;
@@ -24,11 +25,24 @@
 		clearTimeout(timer);
 		timer = setTimeout(async () => {
 			if (keywords.length > 0) {
-				const url = `/api/ticker-search?keywords=${keywords}&fmpKey=${$fmpKey}`;
-				const response = await fetch(url);
-				results = await response.json();
-				highlightedIndex = null;
-				hide = false;
+				try {
+					const url = `/api/ticker-search?keywords=${keywords}&fmpKey=${$fmpKey}`;
+					const response = await fetch(url);
+					const data = await response.json();
+					if (!response.ok && data.message) {
+						throw new Error(data.message);
+					} else {
+						results = data;
+						resetAlert();
+					}
+				} catch (e) {
+					if (e instanceof Error) {
+						$alert = { text: e.message, type: 'error' };
+					}
+				} finally {
+					hide = false;
+					highlightedIndex = null;
+				}
 			}
 		}, 300);
 	};
@@ -38,6 +52,7 @@
 
 		if (key === 'Escape') {
 			keywords = '';
+			resetAlert();
 		} else if (key === 'ArrowUp') {
 			// up
 			highlightedIndex = highlightedIndex ? highlightedIndex - 1 : results.length - 1;

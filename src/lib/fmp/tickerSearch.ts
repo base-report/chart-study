@@ -9,6 +9,9 @@ const tickerSearch = async (
 ): Promise<SearchResult[]> => {
 	const path = `search?query=${query}&limit=${limit}`;
 	const results = await api<SearchResult[]>(path, fmpKey);
+	if (results.length === 0) {
+		throw new Error(`No results found for: ${query}`);
+	}
 	return results.map((r) => SearchResultSchema.parse(r));
 };
 
