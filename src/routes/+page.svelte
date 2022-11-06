@@ -3,6 +3,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import TickerSearch from '$lib/components/TickerSearch.svelte';
 	import Alert from '$lib/components/Alert.svelte';
+	import Chart from '$lib/components/Chart.svelte';
 	import { fmpKey } from '$lib/store/fmp';
 </script>
 
@@ -12,3 +13,4 @@
 </Navbar>
 
 <Alert />
+<Chart />
