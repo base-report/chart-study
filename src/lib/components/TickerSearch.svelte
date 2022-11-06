@@ -6,6 +6,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import SearchIcon from '$lib/components/icons/Search.svelte';
 	import { fmpKey } from '$lib/store/fmp';
+	import { ticker } from '$lib/store/ticker';
 	import { alert, resetAlert } from '$lib/store/alert';
 
 	let keywords = '';
@@ -17,6 +18,10 @@
 	$: keywords.length > -1 && handleInputChange();
 
 	const handleInputChange = () => {
+		if (hide) {
+			return;
+		}
+
 		if (keywords.length === 0) {
 			results = [];
 			return;
@@ -37,6 +42,7 @@
 					}
 				} catch (e) {
 					if (e instanceof Error) {
+						results = [];
 						$alert = { text: e.message, type: 'error' };
 					}
 				} finally {
@@ -47,33 +53,52 @@
 		}, 300);
 	};
 
+	const selectTickerByIndex = (index: number) => {
+		$ticker = results[index].symbol;
+		hide = true;
+		keywords = $ticker;
+	};
+
 	const handleKeydown = (event: KeyboardEvent) => {
 		const { key } = event;
 
 		if (key === 'Escape') {
 			keywords = '';
 			resetAlert();
-		} else if (key === 'ArrowUp') {
-			// up
-			highlightedIndex = highlightedIndex ? highlightedIndex - 1 : results.length - 1;
-		} else if (key === 'ArrowDown') {
-			highlightedIndex =
-				highlightedIndex === null || highlightedIndex === results.length - 1
-					? 0
-					: highlightedIndex + 1;
-		} else if (key === 'Enter' && highlightedIndex !== null) {
-			// TODO: handle enter
+		} else {
+			hide = false;
+
+			if (key === 'ArrowUp') {
+				// up
+				highlightedIndex = highlightedIndex ? highlightedIndex - 1 : results.length - 1;
+			} else if (key === 'ArrowDown') {
+				highlightedIndex =
+					highlightedIndex === null || highlightedIndex === results.length - 1
+						? 0
+						: highlightedIndex + 1;
+			} else if (key === 'Enter' && highlightedIndex !== null) {
+				selectTickerByIndex(highlightedIndex);
+			}
+		}
+	};
+
+	const handleClick = (event: MouseEvent) => {
+		const target = event.target as HTMLElement;
+
+		if (target.tagName === 'INPUT') {
+			hide = false;
 		}
 	};
 </script>
 
-<div class="relative" on:click={() => (hide = false)} on:keydown={handleKeydown}>
+<div class="relative" on:keydown={handleKeydown}>
 	<TextInput
 		id="ticker-search"
 		label="Search: e.g. Apple or AAPL"
 		bind:value={keywords}
 		icon={SearchIcon}
-		isWide={true} />
+		isWide={true}
+		{handleClick} />
 
 	{#if results.length > 0 && !hide}
 		<div
@@ -86,7 +111,9 @@
 					<li
 						class={`${
 							highlightedIndex === i && 'bg-indigo-50 dark:bg-gray-700'
-						} flex py-4 hover:bg-indigo-50 dark:hover:bg-gray-700`}>
+						} flex py-4 hover:bg-indigo-50 dark:hover:bg-gray-700`}
+						on:click={() => selectTickerByIndex(i)}
+						on:keydown={() => {}}>
 						<span class="w-full cursor-pointer">
 							<div class="ml-3">
 								<p class="text text-gray-900 dark:text-gray-100">

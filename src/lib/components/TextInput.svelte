@@ -3,10 +3,12 @@
 
 	export let id: string;
 	export let label: string;
-	export let type: string = 'text';
+	export let type: 'text' | 'password' = 'text';
 	export let value: string;
 	export let icon: SvelteComponent | null = null;
 	export let isWide: boolean = false;
+	export let handleClick: (event: MouseEvent) => void = () => {};
+	export let handleKeyDown: (event: KeyboardEvent) => void = () => {};
 
 	const handleInput = (e: Event) => {
 		const eventValue = (e.target as HTMLInputElement).value;
@@ -14,7 +16,7 @@
 	};
 </script>
 
-<div class="relative">
+<div class="relative" on:click={handleClick} on:keydown={handleKeyDown}>
 	<label for={id} class="sr-only">{label}</label>
 	<div class="relative rounded-md shadow-sm">
 		<div class="relative text-gray-400 focus-within:text-gray-600 dark:focus-within:text-gray-200">
