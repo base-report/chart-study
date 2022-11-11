@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { fetchTimeseriesDaily } from '$lib/fmp/timeseriesDaily';
 
@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	try {
 		const data = await fetchTimeseriesDaily(ticker, fmpKey);
-		return new Response(JSON.stringify(data));
+		return json(data);
 	} catch (e) {
 		const message = e instanceof Error ? e.message : 'Unknown error';
 		throw error(500, message);
