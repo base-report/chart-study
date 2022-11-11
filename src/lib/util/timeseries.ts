@@ -1,7 +1,7 @@
 import type { TimeseriesDaily } from '$lib/data/decoders/TimeseriesDaily';
 import type { ChartData } from '$lib/data/types/ChartData';
 import { roundTo } from '$lib/util/number';
-import { parseDate, getWeek } from '$lib/util/date';
+import { getWeek } from '$lib/util/date';
 
 const getChartData = (
 	timeseriesDaily: TimeseriesDaily
@@ -10,6 +10,7 @@ const getChartData = (
 	weekly: ChartData[];
 	monthly: ChartData[];
 } => {
+	console.time('getChartData');
 	const daily: ChartData[] = [];
 	const weekly: ChartData[] = [];
 	const monthly: ChartData[] = [];
@@ -20,7 +21,7 @@ const getChartData = (
 	for (let d of timeseriesDaily) {
 		const close = roundTo(d.close, 4);
 		const ratio = roundTo((d.adjClose || close) / close, 4);
-		const date = parseDate(d.date);
+		const date = new Date(d.date);
 
 		const o = roundTo(d.open * ratio, 4);
 		const h = roundTo(d.high * ratio, 4);
@@ -68,6 +69,8 @@ const getChartData = (
 			];
 		}
 	}
+
+	console.timeEnd('getChartData');
 
 	return { daily, weekly, monthly };
 };

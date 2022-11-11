@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseDate } from '$lib/util/date';
 
 const TimeseriesDailySchema = z
 	.object({
@@ -16,7 +17,9 @@ const TimeseriesDailySchema = z
 			)
 			.default([])
 	})
-	.transform(({ historical }) => historical.reverse());
+	.transform(({ historical }) =>
+		historical.map((d) => ({ ...d, date: parseDate(d.date) })).reverse()
+	);
 
 type TimeseriesDaily = z.infer<typeof TimeseriesDailySchema>;
 
