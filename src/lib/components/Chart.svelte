@@ -5,134 +5,63 @@
 
 	import { onMount } from 'svelte';
 	import { init, dispose } from 'klinecharts';
-	import { fmpKey } from '$lib/store/fmp';
-	import { ticker } from '$lib/store/ticker';
-	import { getChartData } from '$lib/util/timeseries';
 	import { default as options } from '$lib/util/chart/options';
-	import Loader from '$lib/components/Loader.svelte';
 
-	let charts: Chart[] = [];
-	let chartData: {
-		daily: ChartData[];
-		weekly: ChartData[];
-		monthly: ChartData[];
-	} = {
-		daily: [],
-		weekly: [],
-		monthly: []
-	};
+	export let timeframe: string; // TODO: add type
+	export let chartData: ChartData[];
+
+	let chart: Chart;
 	let timer: TimeoutType;
-	let loading = false;
+	let mounted: boolean = false;
 
-	const fetchChartData = async () => {
-		try {
-			loading = true;
-			const url = `/api/timeseries-daily?ticker=${$ticker}&fmpKey=${$fmpKey}`;
-			const response = await fetch(url);
-			const data = await response.json();
-			if (!response.ok && data.message) {
-				throw new Error(data.message);
-			}
-			chartData = getChartData(data);
-		} catch (error) {
-			// TODO: Handle error
-		} finally {
-			loading = false;
-		}
-	};
+	const updateChart = () => {
+		dispose(chart);
+		if (!chartData.length || !mounted) return;
 
-	const updateCharts = () => {
-		for (let c of charts) {
-			dispose(c);
-		}
-		charts = [];
-		if (!chartData.daily.length) {
-			return;
-		}
+		chart = init(`${timeframe}-chart`, options);
 
-		for (let [key, data] of Object.entries(chartData)) {
-			const chart: Chart = init(`${key}-chart`, options);
+		chart.createTechnicalIndicator('VOL', false, { height: 75 });
+		chart.overrideTechnicalIndicator({
+			name: 'VOL',
+			calcParams: [20]
+		});
 
-			const height = key === 'daily' ? 100 : 50;
-			chart.createTechnicalIndicator('VOL', false, { height });
-			chart.overrideTechnicalIndicator({
-				name: 'VOL',
-				calcParams: [20]
-			});
-
-			chart.applyNewData(
-				data.map(([open, high, low, close, volume, timestamp]) => ({
-					open,
-					high,
-					low,
-					close,
-					volume,
-					timestamp
-				}))
-			);
-
-			charts.push(chart);
-		}
+		chart.applyNewData(
+			chartData.map(([open, high, low, close, volume, timestamp]) => ({
+				open,
+				high,
+				low,
+				close,
+				volume,
+				timestamp
+			}))
+		);
 	};
 
 	const handleWindowResize = () => {
 		clearTimeout(timer);
-		timer = setTimeout(() => {
-			for (let chart of charts) {
-				chart.resize();
-			}
-		}, 50);
+		timer = setTimeout(() => chart.resize(), 50);
 	};
 
-	const handleTickerChange = async () => {
-		await fetchChartData();
-		updateCharts();
-	};
-
-	$: $ticker && handleTickerChange();
-
-	onMount(async () => {
+	onMount(() => {
+		mounted = true;
+		updateChart();
 		window.addEventListener('resize', handleWindowResize);
 		return () => window.removeEventListener('resize', handleWindowResize);
 	});
+
+	$: chartData && updateChart();
 </script>
 
-{#if loading}
-	<Loader />
-{:else}
-	<div class="h-[calc(100vh-64px)] bg-white dark:bg-black sm:grid sm:grid-flow-col sm:grid-rows-3">
-		<div id="daily-chart" class="relative sm:col-span-2 sm:row-span-2">
-			<span
-				class="absolute top-14 left-2 z-10 font-mono text-sm font-bold text-gray-900 text-opacity-40 dark:text-gray-300">
-				DAILY
-			</span>
-		</div>
-		<div class="flex sm:col-span-1">
-			<div id="weekly-chart" class="chart relative">
-				<span
-					class="absolute top-5 left-2 z-10 font-mono text-sm font-bold text-gray-900 text-opacity-40 dark:text-gray-300">
-					WEEKLY
-				</span>
-			</div>
-		</div>
-		<div class="flex sm:col-span-1">
-			<div id="monthly-chart" class="chart relative">
-				<span
-					class="absolute top-5 left-2 z-10 font-mono text-sm font-bold text-gray-900 text-opacity-40 dark:text-gray-300">
-					MONTHLY
-				</span>
-			</div>
-		</div>
-	</div>
-{/if}
+<div id={`${timeframe}-chart`} class="chart relative">
+	<span
+		class="absolute top-0 right-16 z-10 font-mono uppercase text-sm font-bold text-gray-900 text-opacity-40 dark:text-gray-300">
+		{timeframe}
+	</span>
+</div>
 
 <style lang="postcss">
-	#daily-chart {
-		width: 100%;
-	}
-
-	#weekly-chart,
-	#monthly-chart {
+	.chart {
 		width: 100%;
 	}
 </style>
