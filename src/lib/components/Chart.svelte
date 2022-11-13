@@ -38,16 +38,22 @@
 		);
 	};
 
-	const handleWindowResize = () => {
+	const handleContainerResize = () => {
+		if (!chart) return;
 		clearTimeout(timer);
 		timer = setTimeout(() => chart.resize(), 50);
+	};
+
+	const addContainerResizeObserver = () => {
+		const resizeObserver = new ResizeObserver(() => handleContainerResize());
+		const container = document.getElementById(`${timeframe}-chart`);
+		if (container) resizeObserver.observe(container);
 	};
 
 	onMount(() => {
 		mounted = true;
 		updateChart();
-		window.addEventListener('resize', handleWindowResize);
-		return () => window.removeEventListener('resize', handleWindowResize);
+		addContainerResizeObserver();
 	});
 
 	$: chartData && updateChart();
