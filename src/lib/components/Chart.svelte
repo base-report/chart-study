@@ -61,7 +61,8 @@
 
 <div id={`${timeframe}-chart`} class="chart relative">
 	<span
-		class="absolute top-0 right-16 z-10 font-mono uppercase text-sm font-bold text-gray-900 text-opacity-40 dark:text-gray-300">
+		class="absolute top-0 right-16 z-10 font-mono uppercase text-sm font-bold text-gray-900 text-opacity-40 dark:text-gray-300"
+	>
 		{timeframe}
 	</span>
 </div>

@@ -34,7 +34,8 @@
 				name={id}
 				{type}
 				{value}
-				on:input={handleInput} />
+				on:input={handleInput}
+			/>
 		</div>
 	</div>
 </div>

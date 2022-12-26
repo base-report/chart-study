@@ -264,4 +264,4 @@ export default {
 			offset: [0, 20]
 		}
 	}
-}
+};

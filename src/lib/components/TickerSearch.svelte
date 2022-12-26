@@ -98,14 +98,16 @@
 		bind:value={keywords}
 		icon={SearchIcon}
 		isWide={true}
-		{handleClick} />
+		{handleClick}
+	/>
 
 	{#if results.length > 0 && !hide}
 		<div
 			use:clickOutside={() => (hide = true)}
 			in:scale={{ duration: 100, start: 0.95 }}
 			out:scale={{ duration: 75, start: 0.95 }}
-			class="absolute left-0 top-12 right-0 z-20 overflow-hidden rounded-md bg-white shadow dark:bg-gray-600">
+			class="absolute left-0 top-12 right-0 z-20 overflow-hidden rounded-md bg-white shadow dark:bg-gray-600"
+		>
 			<ul class="divide-y divide-gray-200">
 				{#each results as r, i}
 					<li
@@ -113,7 +115,8 @@
 							highlightedIndex === i && 'bg-indigo-50 dark:bg-gray-700'
 						} flex py-4 hover:bg-indigo-50 dark:hover:bg-gray-700`}
 						on:click={() => selectTickerByIndex(i)}
-						on:keydown={() => {}}>
+						on:keydown={() => {}}
+					>
 						<span class="w-full cursor-pointer">
 							<div class="ml-3">
 								<p class="text text-gray-900 dark:text-gray-100">
