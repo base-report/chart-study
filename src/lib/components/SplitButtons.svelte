@@ -1,15 +1,17 @@
 <script lang="ts">
 	import ArrowRectangleIcon from '$lib/components/icons/ArrowRectangle.svelte';
+	import { performSplit } from '$lib/store/panes';
 
-	// TODO: add button handlers
+	const splitRight = () => performSplit('right');
+	const splitDown = () => performSplit('down');
 </script>
 
 <span class="isolate inline-flex rounded-md shadow-sm">
-	<button type="button" class="rounded-l-md" title="Split right">
+	<button type="button" class="rounded-l-md" title="Split right" on:click={splitRight}>
 		<span class="sr-only">Split right</span>
 		<ArrowRectangleIcon direction="right" />
 	</button>
-	<button type="button" class="-ml-px rounded-r-md" title="Split down">
+	<button type="button" class="-ml-px rounded-r-md" title="Split down" on:click={splitDown}>
 		<span class="sr-only">Split down</span>
 		<ArrowRectangleIcon direction="down" />
 	</button>

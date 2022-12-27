@@ -1,9 +1,11 @@
-import type { SplitDirection } from '$lib/data/types/SplitDirection';
-
-type Pane = {
-	id: number;
-	parentId?: number;
-	split?: SplitDirection;
+type Splitpanes = {
+	id: string;
+	horizontal: boolean;
+	children: Array<Splitpanes | Pane>;
 };
 
-export type { Pane };
+type Pane = {
+	id: string;
+};
+
+export type { Pane, Splitpanes };

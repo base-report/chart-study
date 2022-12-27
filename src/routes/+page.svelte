@@ -4,8 +4,9 @@
 	import TickerSearch from '$lib/components/TickerSearch.svelte';
 	import SplitButtons from '$lib/components/SplitButtons.svelte';
 	import Alert from '$lib/components/Alert.svelte';
-	import Frame from '$lib/components/Frame.svelte';
+	import PanesTree from '$lib/components/PanesTree.svelte';
 	import { fmpKey } from '$lib/store/fmp';
+	import { panesTree } from '$lib/store/panes';
 </script>
 
 <div class="h-screen">
@@ -16,5 +17,5 @@
 	</Navbar>
 
 	<Alert />
-	<Frame />
+	<PanesTree tree={$panesTree} />
 </div>

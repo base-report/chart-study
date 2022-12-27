@@ -1,23 +1,21 @@
 <script lang="ts">
 	import { activePaneId } from '$lib/store/panes';
+	import { Pane } from 'svelte-splitpanes';
 
-	export let id: number;
-
-	const activatePane = () => {
-		activePaneId.set(id);
-		console.log('activated pane', $activePaneId);
-	};
+	export let id: string = '';
+	export let isWrapper: boolean = false;
 
 	$: isActive = $activePaneId === id;
 </script>
 
-<div
-	id={`pane-${id}`}
-	class={`${
-		isActive ? 'border border-indigo-700' : ''
-	} w-full h-full bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100`}
-	on:click={activatePane}
-	on:keyup={activatePane}
->
-	Pane
-</div>
+{#if !isWrapper}
+	<Pane minSize={20}>
+		<div
+			{id}
+			class={`pane-content ${
+				isActive ? 'bg-indigo-300' : 'bg-indigo-200'
+			} w-full h-full text-black`}>
+			<slot />
+		</div>
+	</Pane>
+{/if}
