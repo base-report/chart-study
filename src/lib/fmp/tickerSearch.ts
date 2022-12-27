@@ -2,11 +2,7 @@ import { api } from '$lib/fmp/api';
 import type { SearchResult } from '$lib/data/decoders/SearchResult';
 import { SearchResultSchema } from '$lib/data/decoders/SearchResult';
 
-const tickerSearch = async (
-	query: string,
-	fmpKey: string,
-	limit: number = 20
-): Promise<SearchResult[]> => {
+const tickerSearch = async (query: string, fmpKey: string, limit = 20): Promise<SearchResult[]> => {
 	const path = `search?query=${query}&limit=${limit}`;
 	const results = await api<SearchResult[]>(path, fmpKey);
 	if (results.length === 0) {

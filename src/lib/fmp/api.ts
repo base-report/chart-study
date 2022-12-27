@@ -1,6 +1,6 @@
 const FMP_API_URL = 'https://financialmodelingprep.com/api';
 
-const api = async <T>(path: string, fmpKey: string, version: number = 3): Promise<T> => {
+const api = async <T>(path: string, fmpKey: string, version = 3): Promise<T> => {
 	const prefix = path.includes('?') ? '&' : '?';
 	const url = `${FMP_API_URL}/v${version}/${path}${prefix}apikey=${fmpKey}`;
 

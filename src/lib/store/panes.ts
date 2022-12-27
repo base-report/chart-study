@@ -1,4 +1,4 @@
-import { writable, derived, get } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import type { Splitpanes, Pane } from '$lib/data/types/Pane';
 import type { SplitDirection } from '$lib/data/types/SplitDirection';
 
@@ -8,32 +8,14 @@ const DEFAULT_PANES_TREE: Splitpanes = {
 	children: [
 		{
 			id: 'pane-1'
-		},
-		{
-			id: 'splitpanes-2',
-			horizontal: true,
-			children: [
-				{
-					id: 'pane-2'
-				},
-				{
-					id: 'pane-4'
-				},
-				{
-					id: 'pane-5'
-				}
-			]
-		},
-		{
-			id: 'pane-3'
 		}
 	]
 };
 
 const panesTree = writable<Splitpanes>(DEFAULT_PANES_TREE);
 const activePaneId = writable<string>(DEFAULT_PANES_TREE.children[0].id);
-const panesCount = writable(5);
-const splitpanesCount = writable(2);
+const panesCount = writable(1);
+const splitpanesCount = writable(1);
 
 const findPaneWithParent = (
 	id: string,
@@ -53,7 +35,7 @@ const findPaneWithParent = (
 	if (!pane) {
 		for (const child of tree.children) {
 			if ('children' in child) {
-				let [_pane, _parent] = findPaneWithParent(id, child);
+				const [_pane, _parent] = findPaneWithParent(id, child);
 				if (_pane) {
 					pane = _pane;
 					parent = _parent;

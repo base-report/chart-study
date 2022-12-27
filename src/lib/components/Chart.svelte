@@ -12,7 +12,7 @@
 
 	let chart: Chart;
 	let timer: TimeoutType;
-	let mounted: boolean = false;
+	let mounted = false;
 
 	const updateChart = () => {
 		dispose(chart);

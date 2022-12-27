@@ -18,7 +18,7 @@ const getChartData = (
 	let week, month;
 
 	// populate daily, weekly, and monthly series
-	for (let d of timeseriesDaily) {
+	for (const d of timeseriesDaily) {
 		const close = roundTo(d.close, 4);
 		const ratio = roundTo((d.adjClose || close) / close, 4);
 		const date = new Date(d.date);

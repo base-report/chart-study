@@ -6,7 +6,7 @@
 	export let type: 'text' | 'password' = 'text';
 	export let value: string;
 	export let icon: SvelteComponent | null = null;
-	export let isWide: boolean = false;
+	export let isWide = false;
 	export let handleClick: (event: MouseEvent) => void = () => {};
 	export let handleKeyDown: (event: KeyboardEvent) => void = () => {};
 

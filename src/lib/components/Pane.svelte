@@ -2,8 +2,8 @@
 	import { activePaneId } from '$lib/store/panes';
 	import { Pane } from 'svelte-splitpanes';
 
-	export let id: string = '';
-	export let isWrapper: boolean = false;
+	export let id = '';
+	export let isWrapper = false;
 
 	$: isActive = $activePaneId === id;
 </script>
@@ -14,7 +14,8 @@
 			{id}
 			class={`pane-content ${
 				isActive ? 'bg-indigo-300' : 'bg-indigo-200'
-			} w-full h-full text-black`}>
+			} w-full h-full text-black`}
+		>
 			<slot />
 		</div>
 	</Pane>
