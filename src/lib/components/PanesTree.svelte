@@ -21,7 +21,7 @@
 
 <Splitpanes horizontal={tree.horizontal} on:pane-click={activatePane}>
 	{#each tree.children as pane}
-		{#if pane.children}
+		{#if pane.type === 'SPLITPANES'}
 			<Pane>
 				<svelte:self tree={pane} />
 			</Pane>

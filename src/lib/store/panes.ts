@@ -4,10 +4,12 @@ import type { Splitpanes, Pane } from '$lib/data/types/Pane';
 import type { SplitDirection } from '$lib/data/types/SplitDirection';
 
 const DEFAULT_PANES_TREE: Splitpanes = {
+	type: 'SPLITPANES',
 	id: 'splitpanes-1',
 	horizontal: false,
 	children: [
 		{
+			type: 'PANE',
 			id: 'pane-1'
 		}
 	]
@@ -35,7 +37,7 @@ const findPaneWithParent = (
 
 	for (const child of tree.children) {
 		if (child.id === id) {
-			pane = child;
+			pane = child as Pane;
 			parent = tree;
 			break;
 		}
@@ -64,7 +66,7 @@ const getUpdatedTree = (tree: Splitpanes, pane: Pane, direction: SplitDirection)
 		return {
 			...tree,
 			children: tree.children.map((child) => {
-				if ('children' in child) {
+				if (child.type === 'SPLITPANES') {
 					return getUpdatedTree(child, pane, direction);
 				}
 				return child;
@@ -72,7 +74,7 @@ const getUpdatedTree = (tree: Splitpanes, pane: Pane, direction: SplitDirection)
 		};
 	}
 
-	const newPane = { id: `pane-${get(panesCount) + 1}` };
+	const newPane: Pane = { type: 'PANE', id: `pane-${get(panesCount) + 1}` };
 
 	const addPane = (): Splitpanes => {
 		panesCount.update((n) => n + 1);
@@ -83,7 +85,8 @@ const getUpdatedTree = (tree: Splitpanes, pane: Pane, direction: SplitDirection)
 	};
 
 	const replaceWithSplitpanes = (horizontal: boolean): Splitpanes => {
-		const newSplitpanes = {
+		const newSplitpanes: Splitpanes = {
+			type: 'SPLITPANES',
 			id: `splitpanes-${get(splitpanesCount) + 1}`,
 			horizontal,
 			children: [pane, newPane]
