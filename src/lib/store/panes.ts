@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store';
+import { browser } from '$app/environment';
 import type { Splitpanes, Pane } from '$lib/data/types/Pane';
 import type { SplitDirection } from '$lib/data/types/SplitDirection';
 
@@ -12,10 +13,18 @@ const DEFAULT_PANES_TREE: Splitpanes = {
 	]
 };
 
-const panesTree = writable<Splitpanes>(DEFAULT_PANES_TREE);
+const stored = browser
+	? (localStorage.panesTree && JSON.parse(localStorage.panesTree)) || DEFAULT_PANES_TREE
+	: DEFAULT_PANES_TREE;
+
+const panesTree = writable<Splitpanes>(stored);
 const activePaneId = writable<string>(DEFAULT_PANES_TREE.children[0].id);
 const panesCount = writable(1);
 const splitpanesCount = writable(1);
+
+panesTree.subscribe((tree: Splitpanes) => {
+	if (browser) localStorage.panesTree = JSON.stringify(tree);
+});
 
 const findPaneWithParent = (
 	id: string,
@@ -49,10 +58,6 @@ const findPaneWithParent = (
 };
 
 const getUpdatedTree = (tree: Splitpanes, pane: Pane, direction: SplitDirection): Splitpanes => {
-	const newPane = {
-		id: `pane-${get(panesCount) + 1}`
-	};
-
 	const index = tree.children.findIndex((child) => child.id === pane.id);
 
 	if (index === -1) {
@@ -67,7 +72,9 @@ const getUpdatedTree = (tree: Splitpanes, pane: Pane, direction: SplitDirection)
 		};
 	}
 
-	const addPane = () => {
+	const newPane = { id: `pane-${get(panesCount) + 1}` };
+
+	const addPane = (): Splitpanes => {
 		panesCount.update((n) => n + 1);
 		return {
 			...tree,
@@ -75,7 +82,7 @@ const getUpdatedTree = (tree: Splitpanes, pane: Pane, direction: SplitDirection)
 		};
 	};
 
-	const replaceWithSplitpanes = (horizontal: boolean) => {
+	const replaceWithSplitpanes = (horizontal: boolean): Splitpanes => {
 		const newSplitpanes = {
 			id: `splitpanes-${get(splitpanesCount) + 1}`,
 			horizontal,
