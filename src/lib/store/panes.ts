@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Splitpanes, Pane } from '$lib/data/types/Pane';
 import type { SplitDirection } from '$lib/data/types/SplitDirection';
@@ -20,13 +20,39 @@ const stored = browser
 	: DEFAULT_PANES_TREE;
 
 const panesTree = writable<Splitpanes>(stored);
-const activePaneId = writable<string>(DEFAULT_PANES_TREE.children[0].id);
-const panesCount = writable(1);
-const splitpanesCount = writable(1);
-
 panesTree.subscribe((tree: Splitpanes) => {
 	if (browser) localStorage.panesTree = JSON.stringify(tree);
 });
+
+const activePaneId = writable<string>(DEFAULT_PANES_TREE.children[0].id);
+
+const ids = derived(panesTree, ($panesTree) => {
+	const paneIds = new Set<number>();
+	const splitpanesIds = new Set<number>();
+
+	const traverse = (node: Splitpanes | Pane) => {
+		if (node.type === 'PANE') {
+			paneIds.add(parseInt(node.id.split('-')[1]));
+		} else {
+			splitpanesIds.add(parseInt(node.id.split('-')[1]));
+			node.children.forEach(traverse);
+		}
+	};
+	traverse($panesTree);
+	return { paneIds, splitpanesIds };
+});
+
+const getNewPaneId = (): string => {
+	const { paneIds } = get(ids);
+	const newId = Math.max(...paneIds) + 1;
+	return `pane-${newId}`;
+};
+
+const getNewSplitpanesId = (): string => {
+	const { splitpanesIds } = get(ids);
+	const newId = Math.max(...splitpanesIds) + 1;
+	return `splitpanes-${newId}`;
+};
 
 const findPaneWithParent = (
 	id: string,
@@ -74,26 +100,20 @@ const getUpdatedTree = (tree: Splitpanes, pane: Pane, direction: SplitDirection)
 		};
 	}
 
-	const newPane: Pane = { type: 'PANE', id: `pane-${get(panesCount) + 1}` };
+	const newPane: Pane = { type: 'PANE', id: getNewPaneId() };
 
-	const addPane = (): Splitpanes => {
-		panesCount.update((n) => n + 1);
-		return {
-			...tree,
-			children: [...tree.children.slice(0, index + 1), newPane, ...tree.children.slice(index + 1)]
-		};
-	};
+	const addPane = (): Splitpanes => ({
+		...tree,
+		children: [...tree.children.slice(0, index + 1), newPane, ...tree.children.slice(index + 1)]
+	});
 
 	const replaceWithSplitpanes = (horizontal: boolean): Splitpanes => {
 		const newSplitpanes: Splitpanes = {
 			type: 'SPLITPANES',
-			id: `splitpanes-${get(splitpanesCount) + 1}`,
+			id: getNewSplitpanesId(),
 			horizontal,
 			children: [pane, newPane]
 		};
-
-		panesCount.update((n) => n + 1);
-		splitpanesCount.update((n) => n + 1);
 
 		return {
 			...tree,
