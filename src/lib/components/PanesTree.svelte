@@ -34,3 +34,14 @@
 		{/if}
 	{/each}
 </Splitpanes>
+
+<style global lang="postcss">
+	.splitpanes__splitter {
+		@apply border-0 bg-indigo-100 dark:bg-indigo-900 !important;
+	}
+
+	.splitpanes__splitter:before,
+	.splitpanes__splitter:after {
+		@apply bg-indigo-500 !important;
+	}
+</style>
