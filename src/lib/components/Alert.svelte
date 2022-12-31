@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition';
-	import type { Alert } from '$lib/data/interfaces/Alert';
 	import XCircleIcon from '$lib/components/icons/X-Circle.svelte';
 	import { alert } from '$lib/store/alert';
 </script>

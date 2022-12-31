@@ -2,6 +2,7 @@
 	import type { Splitpanes as SP_TYPE } from '$lib/data/types/Pane';
 	import { Splitpanes } from 'svelte-splitpanes';
 	import Pane from '$lib/components/Pane.svelte';
+	import Chart from '$lib/components/widgets/chart/Chart.svelte';
 	import { activePaneId } from '$lib/store/panes';
 
 	export let tree: SP_TYPE;
@@ -20,13 +21,16 @@
 </script>
 
 <Splitpanes horizontal={tree.horizontal} on:pane-click={activatePane}>
-	{#each tree.children as pane}
-		{#if pane.type === 'SPLITPANES'}
+	{#each tree.children as node}
+		{#if node.type === 'SPLITPANES'}
 			<Pane>
-				<svelte:self tree={pane} />
+				<svelte:self tree={node} />
 			</Pane>
 		{:else}
-			<Pane id={pane.id}>{pane.id}</Pane>
+			<Pane id={node.id}>
+				<!-- TODO: use dynamic component here -->
+				<Chart paneId={node.id} />
+			</Pane>
 		{/if}
 	{/each}
 </Splitpanes>

@@ -13,6 +13,8 @@
 		<SplitButtons />
 	</Navbar>
 
-	<Alert />
-	<PanesTree tree={$panesTree} />
+	<div class="h-[calc(100%-64px)]">
+		<Alert />
+		<PanesTree tree={$panesTree} />
+	</div>
 </div>
