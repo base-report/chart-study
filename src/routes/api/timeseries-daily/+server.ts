@@ -4,14 +4,13 @@ import { fetchTimeseriesDaily } from '$lib/fmp/timeseriesDaily';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const ticker = url.searchParams.get('ticker');
-	const fmpKey = url.searchParams.get('fmpKey');
 
-	if (!ticker || !fmpKey) {
-		throw error(400, 'Missing ticker or FMP API key');
+	if (!ticker) {
+		throw error(400, 'Missing ticker');
 	}
 
 	try {
-		const data = await fetchTimeseriesDaily(ticker, fmpKey);
+		const data = await fetchTimeseriesDaily(ticker);
 		return json(data);
 	} catch (e) {
 		const message = e instanceof Error ? e.message : 'Unknown error';

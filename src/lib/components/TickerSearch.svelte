@@ -5,7 +5,6 @@
 	import type { MaybeNumber } from '$lib/data/types/Maybes';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import SearchIcon from '$lib/components/icons/Search.svelte';
-	import { fmpKey } from '$lib/store/fmp';
 	import { ticker } from '$lib/store/ticker';
 	import { alert, resetAlert } from '$lib/store/alert';
 
@@ -31,7 +30,7 @@
 		timer = setTimeout(async () => {
 			if (keywords.length > 0) {
 				try {
-					const url = `/api/ticker-search?keywords=${keywords}&fmpKey=${$fmpKey}`;
+					const url = `/api/ticker-search?keywords=${keywords}`;
 					const response = await fetch(url);
 					const data = await response.json();
 					if (!response.ok && data.message) {

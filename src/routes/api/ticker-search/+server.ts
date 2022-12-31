@@ -4,14 +4,13 @@ import { tickerSearch } from '$lib/fmp/tickerSearch';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('keywords');
-	const fmpKey = url.searchParams.get('fmpKey');
 
-	if (!query || !fmpKey) {
-		throw error(400, 'Missing search query or FMP API key');
+	if (!query) {
+		throw error(400, 'Missing search query');
 	}
 
 	try {
-		const data = await tickerSearch(query, fmpKey);
+		const data = await tickerSearch(query);
 		return json(data);
 	} catch (e) {
 		const message = e instanceof Error ? e.message : 'Unknown error';

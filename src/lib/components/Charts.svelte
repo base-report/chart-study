@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { ChartData } from '$lib/data/types/ChartData';
 
-	import { fmpKey } from '$lib/store/fmp';
 	import { ticker } from '$lib/store/ticker';
 	import { getChartData } from '$lib/util/timeseries';
 	import Loader from '$lib/components/Loader.svelte';
@@ -21,7 +20,7 @@
 	const fetchChartData = async () => {
 		try {
 			loading = true;
-			const url = `/api/timeseries-daily?ticker=${$ticker}&fmpKey=${$fmpKey}`;
+			const url = `/api/timeseries-daily?ticker=${$ticker}`;
 			const response = await fetch(url);
 			const data = await response.json();
 			if (!response.ok && data.message) {
