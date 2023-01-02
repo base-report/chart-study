@@ -14,9 +14,9 @@
 	import { default as darkOptions } from './darkOptions';
 
 	export let paneId: string;
-	export let timeframe: ChartTimeFrame = 'daily';
+	export let timeFrame: ChartTimeFrame = 'daily';
 
-	$: id = `${paneId}-${timeframe}-chart`;
+	$: id = `${paneId}-${timeFrame}-chart`;
 
 	let chart: Chart;
 	let timer: TimeoutType;
@@ -52,7 +52,7 @@
 
 	const updateChart = () => {
 		dispose(chart);
-		if (!chartData[timeframe].length || !mounted) return;
+		if (!chartData[timeFrame].length || !mounted) return;
 
 		const chartOptions = isDark ? darkOptions : options;
 		chart = init(id, chartOptions);
@@ -64,7 +64,7 @@
 		});
 
 		chart.applyNewData(
-			chartData[timeframe].map(([open, high, low, close, volume, timestamp]) => ({
+			chartData[timeFrame].map(([open, high, low, close, volume, timestamp]) => ({
 				open,
 				high,
 				low,
@@ -105,6 +105,6 @@
 	<span
 		class="absolute top-0 right-16 z-10 font-mono uppercase text-sm font-bold text-gray-900 text-opacity-40 dark:text-gray-300"
 	>
-		{timeframe}
+		{timeFrame}
 	</span>
 </div>

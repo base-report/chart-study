@@ -2,6 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { Splitpanes, Pane } from '$lib/data/types/Pane';
 import type { SplitDirection } from '$lib/data/types/SplitDirection';
+import type { Widget } from '$lib/data/types/Widget';
 
 const DEFAULT_PANES_TREE: Splitpanes = {
 	type: 'SPLITPANES',
@@ -144,4 +145,32 @@ const performSplit = (direction: SplitDirection) => {
 	panesTree.set(updatedTree);
 };
 
-export { panesTree, activePaneId, performSplit };
+const assignWidgetToPane = (paneId: string, widget: Widget) => {
+	const currentTree = get(panesTree);
+
+	const [pane, parent] = findPaneWithParent(paneId, currentTree);
+
+	if (!pane || !parent) {
+		return;
+	}
+
+	const updatedTree = {
+		...currentTree,
+		children: currentTree.children.map((node) => {
+			if (node.id === parent.id) {
+				return {
+					...parent,
+					children: parent.children.map((child) =>
+						child.id === pane.id ? { ...pane, widget } : child
+					)
+				};
+			}
+
+			return node.id === paneId ? { ...node, widget } : node;
+		})
+	};
+
+	panesTree.set(updatedTree);
+};
+
+export { panesTree, activePaneId, performSplit, assignWidgetToPane };
