@@ -1,3 +1,4 @@
+import type { Maybe } from '$lib/data/types/Maybes';
 import type { Widget } from '$lib/data/types/Widget';
 
 type Splitpanes = {
@@ -10,7 +11,7 @@ type Splitpanes = {
 type Pane = {
 	type: 'PANE';
 	id: string;
-	widget?: Widget;
+	widget?: Maybe<Widget>;
 };
 
 export type { Pane, Splitpanes };

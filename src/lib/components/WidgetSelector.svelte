@@ -7,14 +7,18 @@
 	import { assignWidgetToPane } from '$lib/store/panes';
 
 	export let pane: Pane;
+	let showDropDown = false;
 
-	const handleClick = (widget: Widget) => {
+	const assignWidget = (widget: Widget) => {
+		showDropDown = false;
 		const options = { paneId: pane.id, timeFrame: 'daily' };
 		assignWidgetToPane(pane.id, { ...widget, options });
 	};
+
+	const clearWidget = () => assignWidgetToPane(pane.id, null);
 </script>
 
-<Dropdown showDropDown={!pane.widget}>
+<Dropdown bind:showDropDown>
 	<svelte:fragment slot="label">
 		{#if pane.widget}
 			{pane.widget.name}
@@ -24,7 +28,10 @@
 	</svelte:fragment>
 	<svelte:fragment slot="options">
 		{#each widgets as widget}
-			<DropdownOption handleClick={() => handleClick(widget)}>{widget.name}</DropdownOption>
+			<DropdownOption handleClick={() => assignWidget(widget)}>{widget.name}</DropdownOption>
 		{/each}
+		{#if pane.widget}
+			<DropdownOption handleClick={() => clearWidget()}>Clear</DropdownOption>
+		{/if}
 	</svelte:fragment>
 </Dropdown>

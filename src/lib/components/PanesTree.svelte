@@ -3,8 +3,8 @@
 	import type { Widget } from '$lib/data/types/Widget';
 	import { Splitpanes } from 'svelte-splitpanes';
 	import Pane from '$lib/components/Pane.svelte';
+	import Toolbar from '$lib/components/Toolbar.svelte';
 	import WidgetSelector from '$lib/components/WidgetSelector.svelte';
-	import Chart from '$lib/components/widgets/chart/Chart.svelte';
 	import { activePaneId } from '$lib/store/panes';
 	import { widgets } from '$lib/widgets';
 
@@ -44,7 +44,9 @@
 			</Pane>
 		{:else}
 			<Pane id={node.id}>
-				<WidgetSelector pane={node} />
+				<Toolbar id={node.id}>
+					<WidgetSelector pane={node} />
+				</Toolbar>
 				{@const c = getWidgetComponent(node.widget)}
 				{#if c}
 					<svelte:component this={c.component} {...c.options} />

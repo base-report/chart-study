@@ -1,21 +1,13 @@
 <script lang="ts">
-	import { activePaneId } from '$lib/store/panes';
 	import { Pane } from 'svelte-splitpanes';
 
 	export let id = '';
 	export let isWrapper = false;
-
-	$: isActive = $activePaneId === id;
 </script>
 
 {#if !isWrapper}
 	<Pane minSize={20}>
-		<div
-			{id}
-			class={`pane-content ${
-				isActive ? 'bg-indigo-300' : 'bg-indigo-200'
-			} w-full h-full text-black`}
-		>
+		<div {id} class="pane-content w-full h-full bg-white dark:bg-black">
 			<slot />
 		</div>
 	</Pane>
