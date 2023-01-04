@@ -90,7 +90,7 @@
 	};
 </script>
 
-<div class="relative" on:keydown={handleKeydown}>
+<div class="relative z-30" on:keydown={handleKeydown}>
 	<TextInput
 		id="ticker-search"
 		label="Search: e.g. Apple or AAPL"

@@ -20,6 +20,12 @@
 	{#if showDropDown}
 		<div
 			use:clickOutside={() => setTimeout(() => (showDropDown = false), 10)}
+			on:click={() => (showDropDown = false)}
+			on:keyup={(e) => {
+				if (e.key === 'Escape' || e.key === 'Enter') {
+					showDropDown = false;
+				}
+			}}
 			in:scale={{ duration: 100, start: 0.95 }}
 			out:scale={{ duration: 75, start: 0.95 }}
 			class="w-32 absolute left-0 mt-3 origin-top-right rounded-md bg-gray-50 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-600"

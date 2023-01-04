@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { Splitpanes as SP_TYPE } from '$lib/data/types/Pane';
 	import type { Widget } from '$lib/data/types/Widget';
+	import type { Maybe } from '$lib/data/types/Maybes';
 	import { Splitpanes } from 'svelte-splitpanes';
 	import Pane from '$lib/components/Pane.svelte';
 	import Toolbar from '$lib/components/Toolbar.svelte';
 	import WidgetSelector from '$lib/components/WidgetSelector.svelte';
+	import WidgetOptionsSelector from '$lib/components/WidgetOptionsSelector.svelte';
 	import { activePaneId } from '$lib/store/panes';
 	import { widgets } from '$lib/widgets';
 
@@ -22,7 +24,7 @@
 		activePaneId.set(paneId);
 	};
 
-	const getWidgetComponent = (_widget: Widget | undefined) => {
+	const getWidgetComponent = (_widget: Maybe<Widget>) => {
 		if (!_widget) {
 			return null;
 		}
@@ -44,10 +46,17 @@
 			</Pane>
 		{:else}
 			<Pane id={node.id}>
+				{@const c = getWidgetComponent(node.widget || null)}
 				<Toolbar id={node.id}>
-					<WidgetSelector pane={node} />
+					<div class="w-full flex justify-between">
+						<WidgetSelector pane={node} />
+						{#if c}
+							<div>
+								<WidgetOptionsSelector pane={node} />
+							</div>
+						{/if}
+					</div>
 				</Toolbar>
-				{@const c = getWidgetComponent(node.widget)}
 				{#if c}
 					<svelte:component this={c.component} {...c.options} />
 				{/if}

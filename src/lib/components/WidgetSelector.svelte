@@ -11,7 +11,14 @@
 
 	const assignWidget = (widget: Widget) => {
 		showDropDown = false;
-		const options = { paneId: pane.id, timeFrame: 'daily' };
+		const options = {
+			paneId: pane.id,
+			...Object.entries(widget.options || {}).reduce(
+				(acc, [k, v]) => ({ ...acc, [k]: v.default }),
+				{}
+			)
+		};
+
 		assignWidgetToPane(pane.id, { ...widget, options });
 	};
 

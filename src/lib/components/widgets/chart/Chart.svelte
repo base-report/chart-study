@@ -23,9 +23,7 @@
 	let mounted = false;
 
 	let chartData: {
-		daily: ChartData[];
-		weekly: ChartData[];
-		monthly: ChartData[];
+		[tf: ChartTimeFrame]: ChartData[];
 	} = {
 		daily: [],
 		weekly: [],
@@ -51,8 +49,9 @@
 	};
 
 	const updateChart = () => {
+		if (!chartData[timeFrame].length || !mounted || loading) return;
+
 		dispose(chart);
-		if (!chartData[timeFrame].length || !mounted) return;
 
 		const chartOptions = isDark ? darkOptions : options;
 		chart = init(id, chartOptions);
@@ -101,10 +100,4 @@
 	{#if loading}
 		<Loader />
 	{/if}
-
-	<span
-		class="absolute top-0 right-16 z-10 font-mono uppercase text-sm font-bold text-gray-900 text-opacity-40 dark:text-gray-300"
-	>
-		{timeFrame}
-	</span>
 </div>
