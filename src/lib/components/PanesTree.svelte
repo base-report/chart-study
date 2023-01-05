@@ -66,6 +66,10 @@
 </Splitpanes>
 
 <style global lang="postcss">
+	.splitpanes {
+		@apply dark:bg-gray-800 !important;
+	}
+
 	.splitpanes__splitter {
 		@apply border-0 bg-indigo-100 dark:bg-indigo-900 !important;
 	}

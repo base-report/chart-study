@@ -26,8 +26,6 @@ panesTree.subscribe((tree: Splitpanes) => {
 	if (browser) localStorage.panesTree = JSON.stringify(tree);
 });
 
-const activePaneId = writable<string>(DEFAULT_PANES_TREE.children[0].id);
-
 const ids = derived(panesTree, ($panesTree) => {
 	const paneIds = new Set<number>();
 	const splitpanesIds = new Set<number>();
@@ -43,6 +41,12 @@ const ids = derived(panesTree, ($panesTree) => {
 	traverse($panesTree);
 	return { paneIds, splitpanesIds };
 });
+
+const defaultPaneId = derived(ids, ({ paneIds }) => `pane-${paneIds.values().next().value}`);
+
+const activePaneId = writable<string>(get(defaultPaneId));
+
+const onePaneLeft = derived(ids, ($ids) => $ids.paneIds.size === 1);
 
 const getNewPaneId = (): string => {
 	const { paneIds } = get(ids);
@@ -148,30 +152,85 @@ const performSplit = (direction: SplitDirection) => {
 
 const assignWidgetToPane = (paneId: string, widget: Maybe<Widget>) => {
 	const currentTree = get(panesTree);
-
 	const [pane, parent] = findPaneWithParent(paneId, currentTree);
 
 	if (!pane || !parent) {
 		return;
 	}
 
-	const updatedTree = {
-		...currentTree,
-		children: currentTree.children.map((node) => {
-			if (node.id === parent.id) {
-				return {
-					...parent,
-					children: parent.children.map((child) =>
-						child.id === pane.id ? { ...pane, widget } : child
-					)
-				};
-			}
+	const getUpdatedTree = (tree: Splitpanes, pane: Pane, widget: Maybe<Widget>): Splitpanes => {
+		const index = tree.children.findIndex((child) => child.id === pane.id);
 
-			return node.id === paneId ? { ...node, widget } : node;
-		})
+		if (index === -1) {
+			return {
+				...tree,
+				children: tree.children.map((child) => {
+					if (child.type === 'SPLITPANES') {
+						return getUpdatedTree(child, pane, widget);
+					}
+					return child;
+				})
+			};
+		}
+
+		return {
+			...tree,
+			children: [
+				...tree.children.slice(0, index),
+				{ ...pane, widget },
+				...tree.children.slice(index + 1)
+			]
+		};
 	};
 
+	const updatedTree = getUpdatedTree(currentTree, pane, widget);
 	panesTree.set(updatedTree);
 };
 
-export { panesTree, activePaneId, performSplit, assignWidgetToPane };
+const removePane = (paneId: string) => {
+	if (get(onePaneLeft)) {
+		return;
+	}
+
+	const currentTree = get(panesTree);
+	const [pane, parent] = findPaneWithParent(paneId, currentTree);
+
+	if (!pane || !parent) {
+		return;
+	}
+
+	if (parent.children.length === 1) {
+		removePane(parent.id);
+		return;
+	}
+
+	const getUpdatedTree = (tree: Splitpanes): Splitpanes => {
+		const index = tree.children.findIndex((child) => child.id === paneId);
+
+		if (index === -1) {
+			return {
+				...tree,
+				children: tree.children.map((child) => {
+					if (child.type === 'SPLITPANES') {
+						return getUpdatedTree(child);
+					}
+					return child;
+				})
+			};
+		}
+
+		const updatedChildren = [...tree.children.slice(0, index), ...tree.children.slice(index + 1)];
+
+		return {
+			...tree,
+			children: updatedChildren
+		};
+	};
+
+	const updatedTree = getUpdatedTree(currentTree);
+	panesTree.set(updatedTree);
+
+	activePaneId.set(get(defaultPaneId));
+};
+
+export { panesTree, activePaneId, performSplit, assignWidgetToPane, removePane, onePaneLeft };
