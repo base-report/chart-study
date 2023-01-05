@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { Chart } from 'klinecharts/types';
-	import type { ChartData, ChartTimeFrame } from '$lib/data/types/ChartData';
+	import type { ChartTimeFrame } from '$lib/data/types/ChartData';
 	import type { TimeoutType } from '$lib/data/types/TimeoutType';
 
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { init, dispose } from 'klinecharts';
 	import { isDark } from '$lib/util/theme';
 	import { ticker } from '$lib/store/ticker';
-	import { getChartData } from '$lib/util/timeseries';
+	import { fetchChartData, loading, chartData } from '$lib/store/timeseries';
 	import Loader from '$lib/components/Loader.svelte';
 
 	import { default as options } from './options';
@@ -22,56 +22,32 @@
 	let timer: TimeoutType;
 	let mounted = false;
 
-	let chartData: {
-		[tf: ChartTimeFrame]: ChartData[];
-	} = {
-		daily: [],
-		weekly: [],
-		monthly: []
-	};
-	let loading = false;
-
-	const fetchChartData = async () => {
-		try {
-			loading = true;
-			const url = `/api/timeseries-daily?ticker=${$ticker}`;
-			const response = await fetch(url);
-			const data = await response.json();
-			if (!response.ok && data.message) {
-				throw new Error(data.message);
-			}
-			chartData = getChartData(data);
-		} catch (error) {
-			// TODO: Handle error
-		} finally {
-			loading = false;
-		}
-	};
-
 	const updateChart = () => {
-		if (!chartData[timeFrame].length || !mounted || loading) return;
+		if (!$chartData[timeFrame].length || !mounted || $loading) return;
 
 		dispose(chart);
 
-		const chartOptions = isDark ? darkOptions : options;
-		chart = init(id, chartOptions);
+		setTimeout(() => {
+			const chartOptions = isDark ? darkOptions : options;
+			chart = init(id, chartOptions);
 
-		chart.createTechnicalIndicator('VOL', false, { height: 75 });
-		chart.overrideTechnicalIndicator({
-			name: 'VOL',
-			calcParams: [20]
-		});
+			chart.createTechnicalIndicator('VOL', false, { height: 75 });
+			chart.overrideTechnicalIndicator({
+				name: 'VOL',
+				calcParams: [20]
+			});
 
-		chart.applyNewData(
-			chartData[timeFrame].map(([open, high, low, close, volume, timestamp]) => ({
-				open,
-				high,
-				low,
-				close,
-				volume,
-				timestamp
-			}))
-		);
+			chart.applyNewData(
+				$chartData[timeFrame].map(([open, high, low, close, volume, timestamp]) => ({
+					open,
+					high,
+					low,
+					close,
+					volume,
+					timestamp
+				}))
+			);
+		}, 0);
 	};
 
 	const handleContainerResize = () => {
@@ -88,16 +64,20 @@
 
 	onMount(() => {
 		mounted = true;
-		updateChart();
 		addContainerResizeObserver();
 	});
 
-	$: id && $ticker && fetchChartData();
-	$: id && chartData.daily && updateChart();
+	onDestroy(() => {
+		dispose(chart);
+		mounted = false;
+	});
+
+	$: $ticker && fetchChartData();
+	$: id && $chartData && updateChart();
 </script>
 
 <div {id} class="relative w-full h-full bg-white dark:bg-black">
-	{#if loading}
+	{#if $loading}
 		<Loader />
 	{/if}
 </div>

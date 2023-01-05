@@ -105,7 +105,7 @@
 			use:clickOutside={() => (hide = true)}
 			in:scale={{ duration: 100, start: 0.95 }}
 			out:scale={{ duration: 75, start: 0.95 }}
-			class="absolute left-0 top-12 right-0 z-20 overflow-hidden rounded-md bg-white shadow dark:bg-gray-600"
+			class="absolute left-0 top-12 right-0 z-20 max-h-96 overflow-auto rounded-md bg-white shadow dark:bg-gray-600"
 		>
 			<ul class="divide-y divide-gray-200">
 				{#each results as r, i}
