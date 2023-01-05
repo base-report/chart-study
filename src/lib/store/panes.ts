@@ -187,6 +187,26 @@ const assignWidgetToPane = (paneId: string, widget: Maybe<Widget>) => {
 	panesTree.set(updatedTree);
 };
 
+// Clean up tree, if a splitpanes has only one child which is another splitpanes,
+// replace the child with the grandchild. Do this recursively. If a splitpanes has
+// no children, remove it.
+
+const cleanUpTree = (tree: Splitpanes): Splitpanes => {
+	if (tree.children.length === 1 && tree.children[0].type === 'SPLITPANES') {
+		return cleanUpTree(tree.children[0]);
+	}
+
+	return {
+		...tree,
+		children: tree.children.map((child) => {
+			if (child.type === 'SPLITPANES') {
+				return cleanUpTree(child);
+			}
+			return child;
+		})
+	};
+};
+
 const removePane = (paneId: string) => {
 	if (get(onePaneLeft)) {
 		return;
@@ -231,6 +251,8 @@ const removePane = (paneId: string) => {
 	panesTree.set(updatedTree);
 
 	activePaneId.set(get(defaultPaneId));
+
+	panesTree.update((tree) => cleanUpTree(tree));
 };
 
 export { panesTree, activePaneId, performSplit, assignWidgetToPane, removePane, onePaneLeft };
