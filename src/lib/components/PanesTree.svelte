@@ -58,7 +58,9 @@
 					</div>
 				</Toolbar>
 				{#if c}
-					<svelte:component this={c.component} {...c.options} />
+					<div class="h-[calc(100%-32px)]">
+						<svelte:component this={c.component} {...c.options} />
+					</div>
 				{/if}
 			</Pane>
 		{/if}
