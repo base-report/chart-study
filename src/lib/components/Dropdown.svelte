@@ -4,6 +4,12 @@
 	import ChevronDownIcon from '$lib/components/icons/ChevronDown.svelte';
 
 	export let showDropDown = false;
+	export let hideOnSelect = true;
+
+	const handleClick = () => {
+		if (!hideOnSelect) return;
+		showDropDown = false;
+	};
 </script>
 
 <div class="relative z-20 inline-block text-left">
@@ -20,7 +26,7 @@
 	{#if showDropDown}
 		<div
 			use:clickOutside={() => setTimeout(() => (showDropDown = false), 10)}
-			on:click={() => (showDropDown = false)}
+			on:click={handleClick}
 			on:keyup={(e) => {
 				if (e.key === 'Escape' || e.key === 'Enter') {
 					showDropDown = false;
