@@ -6,7 +6,7 @@
 	import Pane from '$lib/components/Pane.svelte';
 	import Toolbar from '$lib/components/Toolbar.svelte';
 	import WidgetSelector from '$lib/components/WidgetSelector.svelte';
-	import WidgetOptionsSelector from '$lib/components/WidgetOptionsSelector.svelte';
+	import WidgetOptionsMenuItems from '$lib/components/WidgetOptionsMenuItems.svelte';
 	import { activePaneId } from '$lib/store/panes';
 	import { widgets } from '$lib/widgets';
 
@@ -52,7 +52,7 @@
 						<WidgetSelector pane={node} />
 						{#if c}
 							<div>
-								<WidgetOptionsSelector pane={node} />
+								<WidgetOptionsMenuItems pane={node} />
 							</div>
 						{/if}
 					</div>

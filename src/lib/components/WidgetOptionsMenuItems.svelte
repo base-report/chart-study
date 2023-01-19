@@ -1,0 +1,24 @@
+<script lang="ts">
+	import type { Pane } from '$lib/data/types/Pane';
+	import { widgets } from '$lib/widgets';
+	import WidgetOptionsMenuItemSelect from '$lib/components/WidgetOptionsMenuItemSelect.svelte';
+	import WidgetOptionsMenuItemMultiSelect from '$lib/components/WidgetOptionsMenuItemMultiSelect.svelte';
+
+	export let pane: Pane;
+
+	$: widget = widgets.find((w) => w.name === pane.widget?.name);
+	$: widgetOptions = widget
+		? Object.entries(widget.options || {}).filter(([k]) => k !== 'paneId')
+		: [];
+
+	$: selects = widgetOptions.filter(([, { type }]) => type === 'select');
+	$: multiSelects = widgetOptions.filter(([, { type }]) => type === 'multi-select');
+</script>
+
+{#each multiSelects as [select, { label }]}
+	<WidgetOptionsMenuItemMultiSelect {pane} {select} {label} />
+{/each}
+
+{#each selects as [select]}
+	<WidgetOptionsMenuItemSelect {pane} {select} />
+{/each}
