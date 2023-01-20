@@ -48,14 +48,12 @@
 			<Pane id={node.id}>
 				{@const c = getWidgetComponent(node.widget || null)}
 				<Toolbar id={node.id}>
-					<div class="w-full flex justify-between">
-						<WidgetSelector pane={node} />
-						{#if c}
-							<div>
-								<WidgetOptionsMenuItems pane={node} />
-							</div>
-						{/if}
-					</div>
+					<WidgetSelector pane={node} />
+					{#if c}
+						<div>
+							<WidgetOptionsMenuItems pane={node} />
+						</div>
+					{/if}
 				</Toolbar>
 				{#if c}
 					<div class="h-[calc(100%-32px)]">

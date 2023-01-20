@@ -15,10 +15,12 @@
 	$: multiSelects = widgetOptions.filter(([, { type }]) => type === 'multi-select');
 </script>
 
-{#each multiSelects as [select, { label }]}
-	<WidgetOptionsMenuItemMultiSelect {pane} {select} {label} />
-{/each}
+<div class="flex gap-2">
+	{#each multiSelects as [select, { label }]}
+		<WidgetOptionsMenuItemMultiSelect {pane} {select} {label} />
+	{/each}
 
-{#each selects as [select]}
-	<WidgetOptionsMenuItemSelect {pane} {select} />
-{/each}
+	{#each selects as [select]}
+		<WidgetOptionsMenuItemSelect {pane} {select} />
+	{/each}
+</div>

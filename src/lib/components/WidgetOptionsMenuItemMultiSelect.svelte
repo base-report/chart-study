@@ -47,7 +47,7 @@
 								name={key}
 								value={key}
 								checked={!!value}
-								class="h-4 w-4 rounded border-gray-300 cursor-pointer"
+								class="h-4 w-4 cursor-pointer rounded border-gray-300"
 							/>
 						</div>
 					</DropdownOption>

@@ -8,7 +8,7 @@
 	import { init, dispose } from 'klinecharts';
 	import { isDark } from '$lib/util/theme';
 	import { ticker } from '$lib/store/ticker';
-	import { fetchChartData, loading, chartData } from '$lib/store/timeseries';
+	import { fetchChartData, loading, chartData, selectedMove } from '$lib/store/timeseries';
 	import { DEFAULT_CHART_INDICATORS } from '$lib/data/types/ChartIndicators';
 	import Loader from '$lib/components/Loader.svelte';
 
@@ -24,6 +24,72 @@
 	let chart: Chart;
 	let timer: TimeoutType;
 	let mounted = false;
+
+	const onSelectedMoveChange = () => {
+		if (!$selectedMove) return;
+		removeEntryAndExit();
+		scrollChart();
+		addEntryAndExit();
+	};
+
+	const scrollChart = () => {
+		const scrollToIndex = $chartData[timeFrame].findIndex(
+			(d) => d[5] === $selectedMove[timeFrame]?.exit[5]
+		);
+
+		if (scrollToIndex > -1) {
+			chart.scrollToRealTime();
+			chart.scrollToDataIndex(scrollToIndex);
+		}
+	};
+
+	const addEntryAndExit = () => {
+		const entry = $selectedMove[timeFrame]?.entry;
+		const exit = $selectedMove[timeFrame]?.exit;
+		if (!entry || !exit) return;
+
+		chart.createAnnotation(
+			{
+				point: { timestamp: entry[5], value: entry[2] },
+				styles: {
+					position: 'point',
+					offset: [20, 0],
+					symbol: {
+						type: 'custom'
+					}
+				},
+				drawCustomSymbol: ({ ctx, coordinate: { x, y } }) => {
+					ctx.fillStyle = isDark ? '#FFF' : '#000';
+					ctx.font = '13px sans-serif semibold';
+					ctx.fillText('ENTRY', x - 20, y);
+					ctx.fill();
+				}
+			},
+			'candle_pane'
+		);
+
+		chart.createAnnotation(
+			{
+				point: { timestamp: exit[5], value: exit[2] },
+				styles: {
+					position: 'point',
+					offset: [20, 0],
+					symbol: {
+						type: 'custom'
+					}
+				},
+				drawCustomSymbol: ({ ctx, coordinate: { x, y } }) => {
+					ctx.fillStyle = isDark ? '#FFF' : '#000';
+					ctx.font = '13px sans-serif semibold';
+					ctx.fillText('EXIT', x - 15, y);
+					ctx.fill();
+				}
+			},
+			'candle_pane'
+		);
+	};
+
+	const removeEntryAndExit = () => chart.removeAnnotation('candle_pane');
 
 	const updateChart = () => {
 		if (!$chartData[timeFrame].length || !mounted || $loading) return;
@@ -56,7 +122,6 @@
 	};
 
 	const handleContainerResize = () => {
-		if (!chart) return;
 		clearTimeout(timer);
 		timer = setTimeout(() => chart.resize(), 50);
 	};
@@ -99,10 +164,13 @@
 	$: $ticker && fetchChartData();
 	$: id && $chartData && updateChart();
 	$: id && indicators && updateChartIndicators();
+	$: chart && $selectedMove && onSelectedMoveChange();
 </script>
 
-<div {id} class="relative w-full h-full bg-white dark:bg-black">
+<div {id} class="relative h-full w-full bg-white dark:bg-black">
 	{#if $loading}
-		<Loader />
+		<div class="absolute top-0 left-0 flex h-full w-full items-center justify-center">
+			<Loader />
+		</div>
 	{/if}
 </div>

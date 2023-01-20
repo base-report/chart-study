@@ -1,4 +1,5 @@
-import type { ChartData, ChartTimeFrame } from '$lib/data/types/ChartData';
+import type { ChartData, ChartTimeFrame, MarkedMove } from '$lib/data/types/ChartData';
+import type { Maybe } from '$lib/data/types/Maybes';
 
 import { get, writable } from 'svelte/store';
 import { ticker } from '$lib/store/ticker';
@@ -10,10 +11,17 @@ const chartData = writable<{ [tf: ChartTimeFrame]: ChartData[] }>({
 	monthly: []
 });
 
+const selectedMove = writable<{ [tf: ChartTimeFrame]: Maybe<MarkedMove> }>({
+	daily: null,
+	weekly: null,
+	monthly: null
+});
+
 const loading = writable(false);
 
 const fetchChartData = async () => {
 	const _ticker = get(ticker);
+	console.log('fetching chart data for', _ticker);
 
 	try {
 		if (!get(loading)) {
@@ -22,7 +30,8 @@ const fetchChartData = async () => {
 			const data = await response.json();
 			loading.set(false);
 
-			chartData.set(getChartData(data));
+			const _chartData = getChartData(data);
+			chartData.set(_chartData);
 		}
 	} catch (error) {
 		loading.set(false);
@@ -30,4 +39,36 @@ const fetchChartData = async () => {
 	}
 };
 
-export { fetchChartData, loading, chartData };
+const selectMove = (move: MarkedMove) => {
+	const _chartData = get(chartData) as { [tf: ChartTimeFrame]: ChartData[] };
+	const entryIndexDaily = _chartData.daily.findIndex((c) => c[5] === move.entry[5]);
+	const exitIndexDaily = _chartData.daily.findIndex((c) => c[5] === move.exit[5]);
+
+	const entryIndexWeekly = Math.floor(
+		(entryIndexDaily / _chartData.daily.length) * _chartData.weekly.length
+	);
+	const exitIndexWeekly = Math.floor(
+		(exitIndexDaily / _chartData.daily.length) * _chartData.weekly.length
+	);
+
+	const entryIndexMonthly = Math.floor(
+		(entryIndexDaily / _chartData.daily.length) * _chartData.monthly.length
+	);
+	const exitIndexMonthly = Math.floor(
+		(exitIndexDaily / _chartData.daily.length) * _chartData.monthly.length
+	);
+
+	selectedMove.set({
+		daily: move,
+		weekly: {
+			entry: _chartData.weekly[entryIndexWeekly],
+			exit: _chartData.weekly[exitIndexWeekly]
+		},
+		monthly: {
+			entry: _chartData.monthly[entryIndexMonthly],
+			exit: _chartData.monthly[exitIndexMonthly]
+		}
+	});
+};
+
+export { fetchChartData, loading, chartData, selectedMove, selectMove };

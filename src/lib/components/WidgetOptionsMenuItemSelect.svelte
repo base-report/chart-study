@@ -25,9 +25,12 @@
 	};
 </script>
 
-{#if pane.widget?.options}
+{#if pane.widget?.options && widget?.options?.[select]}
 	<Dropdown>
 		<svelte:fragment slot="label">
+			{#if widget.options[select].alwaysShowLabel}
+				{widget.options[select].label}:
+			{/if}
 			{pane.widget.options[select]}
 		</svelte:fragment>
 		<svelte:fragment slot="options">

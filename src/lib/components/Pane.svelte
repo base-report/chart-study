@@ -7,7 +7,7 @@
 
 {#if !isWrapper}
 	<Pane minSize={20}>
-		<div {id} class="pane-content w-full h-full bg-white dark:bg-black">
+		<div {id} class="pane-content h-full w-full bg-white dark:bg-black">
 			<slot />
 		</div>
 	</Pane>
