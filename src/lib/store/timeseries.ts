@@ -21,12 +21,13 @@ const loading = writable(false);
 
 const fetchChartData = async () => {
 	const _ticker = get(ticker);
-	console.log('fetching chart data for', _ticker);
 
 	try {
 		if (!get(loading)) {
 			loading.set(true);
+			console.time('fetchChartData');
 			const response = await fetch(`/api/timeseries-daily?ticker=${_ticker}`);
+			console.timeEnd('fetchChartData');
 			const data = await response.json();
 			loading.set(false);
 

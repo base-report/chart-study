@@ -1,15 +1,9 @@
 const getWeek = (_d: Date): number => {
-	const d = new Date(Date.UTC(_d.getFullYear(), _d.getMonth(), _d.getDate()));
-
-	// Set to nearest Thursday: current date + 4 - current day number
-	// Make Sunday's day number 7
-	d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-
-	// Get first day of year
-	const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-
-	// Calculate full weeks to nearest Thursday
-	return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+	const d = _d.getTime();
+	const yearStart = new Date(Date.UTC(_d.getUTCFullYear(), 0, 1)).getTime();
+	const day = (_d.getUTCDay() || 7) - 4;
+	const nearestThursday = d + day * 86400000;
+	return Math.ceil(((nearestThursday - yearStart) / 86400000 + 1) / 7);
 };
 
 const parseDate = (dateString: string, timeZone = 'US/Eastern') => {
