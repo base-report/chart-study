@@ -123,6 +123,8 @@
 
 	const handleContainerResize = () => {
 		clearTimeout(timer);
+		if (!chart) return;
+
 		timer = setTimeout(() => chart.resize(), 50);
 	};
 

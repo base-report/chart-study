@@ -10,17 +10,17 @@ const getChartData = (
 	weekly: ChartData[];
 	monthly: ChartData[];
 } => {
-	console.time('getChartData');
 	const daily: ChartData[] = [];
 	const weekly = new Map<number, ChartData>();
 	const monthly = new Map<number, ChartData>();
 
-	let week: number, month: number;
+	let week = -1;
+	let month = -1;
 	let weekCounter = 0;
 	let monthCounter = 0;
 
 	// populate daily, weekly, and monthly series
-	timeseriesDaily.forEach((d) => {
+	for (const d of timeseriesDaily) {
 		const close = roundTo(d.close, 4);
 		const ratio = roundTo((d.adjClose || close) / close, 4);
 		const date = new Date(d.date);
@@ -76,9 +76,7 @@ const getChartData = (
 				]);
 			}
 		}
-	});
-
-	console.timeEnd('getChartData');
+	}
 
 	return { daily, weekly: [...weekly.values()], monthly: [...monthly.values()] };
 };

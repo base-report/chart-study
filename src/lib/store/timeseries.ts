@@ -3,7 +3,6 @@ import type { Maybe } from '$lib/data/types/Maybes';
 
 import { get, writable } from 'svelte/store';
 import { ticker } from '$lib/store/ticker';
-import { getChartData } from '$lib/util/timeseries';
 
 const chartData = writable<{ [tf: ChartTimeFrame]: ChartData[] }>({
 	daily: [],
@@ -25,14 +24,10 @@ const fetchChartData = async () => {
 	try {
 		if (!get(loading)) {
 			loading.set(true);
-			console.time('fetchChartData');
-			const response = await fetch(`/api/timeseries-daily?ticker=${_ticker}`);
-			console.timeEnd('fetchChartData');
+			const response = await fetch(`/api/chart-data?ticker=${_ticker}`);
 			const data = await response.json();
 			loading.set(false);
-
-			const _chartData = getChartData(data);
-			chartData.set(_chartData);
+			chartData.set(data);
 		}
 	} catch (error) {
 		loading.set(false);

@@ -1,5 +1,6 @@
-import { api } from '$lib/fmp/api';
 import type { TimeseriesDaily } from '$lib/data/decoders/TimeseriesDaily';
+
+import { api } from '$lib/fmp/api';
 import { TimeseriesDailySchema } from '$lib/data/decoders/TimeseriesDaily';
 
 const fetchTimeseriesDaily = async (ticker: string): Promise<TimeseriesDaily> => {
