@@ -3,6 +3,8 @@ import { CHART_TIME_FRAMES } from '$lib/data/types/ChartData';
 import { DEFAULT_CHART_INDICATORS } from '$lib/data/types/ChartIndicators';
 import Chart from '$lib/components/widgets/chart/Chart.svelte';
 import MoveFinder from '$lib/components/widgets/move-finder/MoveFinder.svelte';
+import CodeEditor from '$lib/components/widgets/code-editor/CodeEditor.svelte';
+import { DEFAULT_CODE, runCodeInWidget } from '$lib/components/widgets/code-editor/util';
 
 const widgets: Widget[] = [
 	{
@@ -47,6 +49,22 @@ const widgets: Widget[] = [
 				alwaysShowLabel: true,
 				options: [20, 30, 40, 50, 100].map((i) => `> ${i}%`),
 				default: '> 20%'
+			}
+		}
+	},
+	{
+		name: 'Advanced move finder',
+		component: CodeEditor,
+		options: {
+			runButton: {
+				type: 'button',
+				label: 'Run code',
+				action: runCodeInWidget
+			},
+			code: {
+				type: 'storage-only',
+				default: DEFAULT_CODE,
+				value: ''
 			}
 		}
 	}
