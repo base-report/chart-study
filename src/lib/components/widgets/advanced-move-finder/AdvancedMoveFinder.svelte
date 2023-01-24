@@ -16,10 +16,7 @@
 	$: theme = isDark ? oneDark : undefined;
 	$: combosForPane = Object.keys($combos).includes(paneId) ? $combos[paneId] : [];
 
-	onDestroy(() => {
-		console.log('destroying');
-		removeCombosForPane(paneId);
-	});
+	onDestroy(() => removeCombosForPane(paneId));
 
 	const updateWidgetCode = () => {
 		if (!widget?.options) return;
