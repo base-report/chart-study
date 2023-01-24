@@ -34,7 +34,7 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="max-h-[42%] overflow-x-auto">
+	<div class="max-h-[50%] overflow-x-auto">
 		<CodeMirror bind:value={code} on:change={updateWidgetCode} lang={javascript()} {theme} />
 	</div>
 	<div class="grow overflow-x-auto">
