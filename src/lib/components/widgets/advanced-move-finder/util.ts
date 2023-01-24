@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
 import { chartData } from '$lib/store/timeseries';
+import { setCombosForPane } from './store';
 
 const DEFAULT_CODE = `/*
 WARNING: This is a code editor that will run any JavaScript
@@ -14,21 +15,28 @@ of the data is: ChartData[], where ChartData is:
 Your goal is to return an array of arrays of the following
 shape: ChartData[][], which will be used to populate the 
 table below. You can use the "Move finder" widget for 
-inspiration of what to return.
+inspiration on what to return.
 */
+
+let movesFound = []; // array of arrays of ChartData
+
+// add your code here
+
+return movesFound
 `;
 
 const runCodeInWidget = (event: CustomEvent) => {
 	const {
 		pane: {
+			id,
 			widget: { options: code }
 		}
 	} = event.detail;
 	try {
 		const { daily } = get(chartData);
 		const fn = new Function('daily', code.code);
-		// TODO: return combos to the component
-		fn(daily);
+		const movesFound = fn(daily);
+		setCombosForPane(id, movesFound);
 	} catch (e) {
 		console.error(e);
 	}
