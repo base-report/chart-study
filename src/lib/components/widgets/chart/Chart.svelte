@@ -5,7 +5,6 @@
 	import type { TimeoutType } from '$lib/data/types/TimeoutType';
 
 	import { onMount, onDestroy } from 'svelte';
-	import { init, dispose } from 'klinecharts';
 	import { isDark } from '$lib/util/theme';
 	import { ticker } from '$lib/store/ticker';
 	import { fetchChartData, loading, chartData, selectedMove } from '$lib/store/timeseries';
@@ -24,6 +23,8 @@
 	let chart: Chart;
 	let timer: TimeoutType;
 	let mounted = false;
+	let init: Function;
+	let dispose: Function;
 
 	const onSelectedMoveChange = () => {
 		if (!$selectedMove) return;
@@ -153,7 +154,11 @@
 		});
 	};
 
-	onMount(() => {
+	onMount(async () => {
+		const klinecharts = await import('klinecharts/index.blank.js');
+		init = klinecharts.init;
+		dispose = klinecharts.dispose;
+
 		mounted = true;
 		addContainerResizeObserver();
 	});
