@@ -6,17 +6,18 @@ const getWeek = (_d: Date): number => {
 	return Math.ceil(((nearestThursday - yearStart) / 86400000 + 1) / 7);
 };
 
-const parseDate = (dateString: string, timeZone = 'US/Eastern') => {
+const parseDate = (dateString: string) => {
 	const [date, time] = dateString.split(' ');
 	const [y, m, d] = date.split('-').map((x) => parseInt(x));
 	const [hr, min, sec] = time ? time.split(':').map((x) => parseInt(x)) : [16, 0, 0];
 
-	const _date = new Date(Date.UTC(y, m - 1, d, hr, min, sec));
-	const utcDate = new Date(_date.toLocaleString('en-US', { timeZone: 'UTC' }));
-	const tzDate = new Date(_date.toLocaleString('en-US', { timeZone }));
-	const offset = utcDate.getTime() - tzDate.getTime();
-	_date.setTime(_date.getTime() + offset);
+	// create a date object with the provided date and time in UTC
+	let _date = new Date(Date.UTC(y, m - 1, d, hr, min, sec));
+
+	// get the time offset between UTC and the provided time zone
+	const offset = new Date().getTimezoneOffset();
+	_date.setMinutes(_date.getMinutes() + offset);
+
 	return _date;
 };
-
 export { getWeek, parseDate };
