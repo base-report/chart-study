@@ -1,6 +1,6 @@
 {
 	"name": "chart-study",
-	"version": "0.0.1",
+	"version": "0.1.0-alpha",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",

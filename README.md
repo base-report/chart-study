@@ -1,38 +1,72 @@
-# create-svelte
+# Chart Study Tool
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+The Chart Study Tool, by [base.report](https://base.report) is a web-based application for analyzing stock charts.
+It is currently in alpha stage and may contain bugs or unfinished features.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- A frame that starts with a single pane and can be split to the right or to the bottom.
+- Each pane can hold a widget, including a stock chart, move finder, and advanced mover finder (with embedded code editor).
+- Customization options to personalize the user experience.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+![Chart Study Tool Screenshot](screenshot.png)
 
-# create a new project in my-app
-npm create svelte@latest my-app
+## Usage
+
+For a quick start guide on how to use the tool, please watch this [video tutorial](video link).
+
+## Get started
+
+[Financial Modeling Prep](https://site.financialmodelingprep.com/developer) is used as the data provider. You can obtain an API key from their website.
+
+Following are instructions for installing the Chart Study tool locally and on Vercel.
+
+### Local
+
+#### Prerequisites
+
+- [pNpm](https://pnpm.io)
+
+#### Setup environment variables
+
+Create a `.env` file and add the following content. You need to fill in `SECRET_FMP_API_KEY` value with your own API key.
+
+```
+SECRET_FMP_API_URL=https://financialmodelingprep.com/api
+SECRET_FMP_API_KEY=
 ```
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+#### Install and run
 
 ```bash
+pnpm install
 pnpm run dev
 
 # or start the server and open the app in a new browser tab
 pnpm run dev -- --open
 ```
 
-## Building
+### Vercel
 
-To create a production version of your app:
+#### Prerequisites
 
-```bash
-pnpm run build
-```
+- A [GitHub](https://github.com) account.
+- A [Vercel)(http://vercel.com) account that is linked with your GitHub account
 
-You can preview the production build with `pnpm run preview`.
+#### Instructions
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+- Fork this repo.
+- Add your forked repo as a project on Vercel. Please visit https://vercel.com/docs/concepts/projects/overview for more details.
+- Set the environment variables (the same ones from above under Local). Please visit https://vercel.com/docs/concepts/projects/environment-variables for more details
+
+## Feedback
+
+We welcome feedback and bug reports. Please submit an issue or pull request on GitHub, or contact us at [email or other contact information].
+
+## Contributing
+
+We welcome contributions to the Chart Study Tool. Please submit pull requests and issues on GitHub. As the project is currently in alpha stage, there is no set standards yet except for semantic commit messages.
+
+## Licensing
+
+Chart Study Tool is released under the MIT license. See the [LICENSE](LICENSE) file for more information.
