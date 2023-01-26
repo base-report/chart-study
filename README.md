@@ -14,7 +14,9 @@ The Chart Study tool, by [base.report](https://base.report), is a web-based appl
 
 ## Usage
 
-For a quick start guide on how to use the tool, please watch this [video tutorial](https://www.youtube.com/watch?v=zhncPj3sTYo).
+For a quick start guide on how to use the tool, please watch the following video tutorial.
+
+[![Watch the video tutorial](https://i3.ytimg.com/vi/zhncPj3sTYo/maxresdefault.jpg)](https://www.youtube.com/watch?v=zhncPj3sTYo)
 
 ## Get started
 
