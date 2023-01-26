@@ -56,8 +56,9 @@ pnpm run dev -- --open
 
 #### Instructions
 
+- Before setting it up on Vercel. Please note that the website will become accessible by anyone by default. If you want to protect the link, please visit: https://vercel.com/docs/concepts/deployments/deployment-protection.
 - Fork this repo.
-- Add your forked repo as a project on Vercel. Please visit https://vercel.com/docs/concepts/projects/overview for more details.
+- Add your forked repo as a project on Vercel. You should be able to import the project using the default settings provided by Vercel. Please visit https://vercel.com/docs/concepts/projects/overview for more details.
 - Set the environment variables (the same ones from above under Local). Please visit https://vercel.com/docs/concepts/projects/environment-variables for more details
 
 ## Feedback
