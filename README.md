@@ -1,7 +1,8 @@
 # Chart Study Tool
 
-The Chart Study Tool, by [base.report](https://base.report) is a web-based application for analyzing stock charts.
-It is currently in alpha stage and may contain bugs or unfinished features.
+The Chart Study tool, by [base.report](https://base.report), is a web-based application for analyzing stock charts.
+
+**Warning**: It is currently in alpha stage and may contain bugs or unfinished features.
 
 ## Features
 
@@ -9,7 +10,7 @@ It is currently in alpha stage and may contain bugs or unfinished features.
 - Each pane can hold a widget, including a stock chart, move finder, and advanced mover finder (with embedded code editor).
 - Customization options to personalize the user experience.
 
-![Chart Study Tool Screenshot](screenshot.png)
+![Chart Study tool Screenshot](screenshot.png)
 
 ## Usage
 
@@ -61,12 +62,12 @@ pnpm run dev -- --open
 
 ## Feedback
 
-We welcome feedback and bug reports. Please submit an issue or pull request on GitHub, or contact us at [email or other contact information].
+We welcome feedback and bug reports. Please submit an issue or pull request on GitHub.
 
 ## Contributing
 
-We welcome contributions to the Chart Study Tool. Please submit pull requests and issues on GitHub. As the project is currently in alpha stage, there is no set standards yet except for semantic commit messages.
+We welcome contributions to the Chart Study tool. Please submit pull requests and issues on GitHub. As the project is currently in alpha stage, there is no set standards yet except for semantic commit messages.
 
 ## Licensing
 
-Chart Study Tool is released under the MIT license. See the [LICENSE](LICENSE) file for more information.
+Chart Study tool is released under the MIT license. See the [LICENSE](LICENSE) file for more information.
