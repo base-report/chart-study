@@ -54,7 +54,7 @@ pnpm run dev -- --open
 #### Prerequisites
 
 - A [GitHub](https://github.com) account.
-- A [Vercel)(http://vercel.com) account that is linked with your GitHub account
+- A [Vercel](http://vercel.com) account that is linked with your GitHub account
 
 #### Instructions
 
