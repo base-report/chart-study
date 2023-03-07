@@ -1,11 +1,10 @@
 <script lang="ts">
 	import type { Chart } from 'klinecharts/types';
-	import type { ChartTimeFrame, Maybe } from 'base-report-util';
+	import type { ChartTimeFrame, Maybe, TimeoutType, IntervalType } from 'base-report-util';
 	import type { ChartIndicators } from '$lib/data/types/ChartIndicators';
-	import type { TimeoutType } from '$lib/data/types/TimeoutType';
 
 	import { onMount, onDestroy } from 'svelte';
-	import { calculateAdrPct } from 'base-report-util';
+	import { calculateAdrPct, INTRADAY_CHART_TIME_FRAMES } from 'base-report-util';
 	import { isDark } from '$lib/util/theme';
 	import { ticker } from '$lib/store/ticker';
 	import { fetchChartData, loading, chartData, selectedMove } from '$lib/store/timeseries';
@@ -14,6 +13,7 @@
 
 	import { default as options } from './options';
 	import { default as darkOptions } from './darkOptions';
+	import { getVisibleRange } from '$lib/util/chart';
 
 	export let paneId: string;
 	export let timeFrame: ChartTimeFrame = 'daily';
@@ -27,9 +27,68 @@
 
 	let chart: Chart;
 	let timer: TimeoutType;
+	let visibleRangeWatcher: IntervalType;
 	let mounted = false;
 	let init: Function;
 	let dispose: Function;
+	let loadingIntraday = false;
+	let visibleRangeCache = { from: 0, to: 0, more: true };
+
+	const fetchIntradayChartData = async (to?: string) => {
+		if (!$ticker || !visibleRangeCache.more) return;
+
+		try {
+			loadingIntraday = true;
+			let endpoint = `/api/chart-data/intraday?ticker=${$ticker}&timeframe=${timeFrame}`;
+			if (to) {
+				endpoint += `&to=${to}`;
+			}
+			const response = await fetch(endpoint);
+			const _data = await response.json();
+
+			if (to) {
+				if (_data[0][5] === data[0][5]) {
+					visibleRangeCache.more = false;
+					return;
+				}
+
+				const currentFirstTimestamp = data[0][5];
+				const newData = [];
+
+				for (let i = 0; i < _data.length; i++) {
+					// if timestamp is not the same, add to i position of data
+					if (_data[i][5] < currentFirstTimestamp) {
+						newData.push(_data[i]);
+						data.splice(i, 0, _data[i]);
+					} else {
+						break;
+					}
+				}
+
+				// if there is new data, apply more data
+				if (newData.length) {
+					chart.applyMoreData(
+						newData.map(([open, high, low, close, volume, timestamp]) => ({
+							open,
+							high,
+							low,
+							close,
+							volume,
+							timestamp
+						}))
+					);
+				}
+			} else {
+				data = _data;
+				visibleRangeCache.more = true;
+				updateChart();
+			}
+		} catch (error) {
+			console.error(error);
+		} finally {
+			loadingIntraday = false;
+		}
+	};
 
 	const onSelectedMoveChange = () => {
 		if (!$selectedMove) return;
@@ -39,9 +98,7 @@
 	};
 
 	const scrollChart = () => {
-		const scrollToIndex = $chartData[timeFrame].findIndex(
-			(d) => d[5] === $selectedMove[timeFrame]?.exit[5]
-		);
+		const scrollToIndex = data.findIndex((d) => d[5] === $selectedMove[timeFrame]?.exit[5]);
 
 		if (scrollToIndex > -1) {
 			chart.scrollToRealTime();
@@ -98,7 +155,7 @@
 	const removeEntryAndExit = () => chart.removeAnnotation('candle_pane');
 
 	const updateChart = () => {
-		if (!$chartData[timeFrame].length || !mounted || $loading) return;
+		if (!data.length || !mounted || $loading) return;
 
 		dispose(chart);
 
@@ -113,7 +170,7 @@
 			});
 
 			chart.applyNewData(
-				$chartData[timeFrame].map(([open, high, low, close, volume, timestamp]) => ({
+				data.map(([open, high, low, close, volume, timestamp]) => ({
 					open,
 					high,
 					low,
@@ -233,21 +290,55 @@
 
 		mounted = true;
 		addContainerResizeObserver();
+		watchVisibleRange();
 	});
 
+	const fetchData = async () => {
+		if (isIntraday) {
+			await fetchIntradayChartData();
+		} else {
+			await fetchChartData();
+		}
+	};
+
+	const watchVisibleRange = () => {
+		visibleRangeWatcher = setInterval(async () => {
+			if (!isIntraday || !chart || loadingIntraday) return;
+
+			const { from, to } = getVisibleRange(chart);
+
+			if (from === visibleRangeCache.from && to === visibleRangeCache.to) return;
+
+			if (visibleRangeCache.from && visibleRangeCache.to && from === 0) {
+				const date = new Date(data[0][5]);
+				const to = date.toISOString().split('T')[0];
+				await fetchIntradayChartData(to);
+			}
+			visibleRangeCache.from = from;
+			visibleRangeCache.to = to;
+		}, 300);
+	};
+
 	onDestroy(() => {
+		clearTimeout(timer);
+		clearInterval(visibleRangeWatcher);
+
 		dispose(chart);
 		mounted = false;
 	});
 
-	$: $ticker && fetchChartData();
+	$: isIntraday = INTRADAY_CHART_TIME_FRAMES.includes(timeFrame);
+	$: data = isIntraday ? [] : $chartData[timeFrame];
+
+	$: $ticker && fetchData();
+	$: timeFrame && isIntraday && fetchIntradayChartData();
 	$: id && $chartData && updateChart();
 	$: id && indicators && updateChartIndicators();
 	$: chart && $selectedMove && onSelectedMoveChange();
 </script>
 
 <div {id} class="relative h-full w-full bg-white dark:bg-black">
-	{#if $loading}
+	{#if $loading || loadingIntraday}
 		<div class="absolute top-0 left-0 flex h-full w-full items-center justify-center">
 			<Loader />
 		</div>
