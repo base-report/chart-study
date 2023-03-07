@@ -1,4 +1,5 @@
-import type { ChartData } from '$lib/data/types/ChartData';
+import type { ChartData } from 'base-report-util';
+
 import { get, writable } from 'svelte/store';
 
 const combos = writable<{ [paneId: string]: ChartData[][] }>({});

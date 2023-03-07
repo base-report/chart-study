@@ -1,5 +1,5 @@
 import type { Widget } from '$lib/data/types/Widget';
-import { CHART_TIME_FRAMES } from '$lib/data/types/ChartData';
+import { CHART_TIME_FRAMES } from 'base-report-util';
 import { DEFAULT_CHART_INDICATORS } from '$lib/data/types/ChartIndicators';
 import Chart from '$lib/components/widgets/chart/Chart.svelte';
 import MoveFinder from '$lib/components/widgets/move-finder/MoveFinder.svelte';

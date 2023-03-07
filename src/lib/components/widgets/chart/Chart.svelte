@@ -1,14 +1,13 @@
 <script lang="ts">
 	import type { Chart } from 'klinecharts/types';
-	import type { ChartTimeFrame } from '$lib/data/types/ChartData';
+	import type { ChartTimeFrame, Maybe } from 'base-report-util';
 	import type { ChartIndicators } from '$lib/data/types/ChartIndicators';
 	import type { TimeoutType } from '$lib/data/types/TimeoutType';
-	import type { Maybe } from '$lib/data/types/Maybes';
 
 	import { onMount, onDestroy } from 'svelte';
+	import { calculateAdrPct } from 'base-report-util';
 	import { isDark } from '$lib/util/theme';
 	import { ticker } from '$lib/store/ticker';
-	import { calculateAdrPct } from '$lib/util/calc';
 	import { fetchChartData, loading, chartData, selectedMove } from '$lib/store/timeseries';
 	import { DEFAULT_CHART_INDICATORS } from '$lib/data/types/ChartIndicators';
 	import Loader from '$lib/components/Loader.svelte';
@@ -147,9 +146,10 @@
 		chart.removeTechnicalIndicator('candle_pane', 'MA');
 
 		chart.createTechnicalIndicator('MA', true, { id: 'candle_pane' });
-		const calcParams = Object.entries(maIndicators).reduce((acc, [key, value]) => {
+		const calcParams = Object.entries(maIndicators).reduce((acc, [, [key, value]]) => {
 			if (value) {
 				const period = parseInt(key.replace('MA', ''));
+
 				acc.push(period);
 			}
 			return acc;

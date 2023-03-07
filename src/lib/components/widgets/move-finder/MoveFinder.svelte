@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { EntryStrategy, ExitStrategy } from '$lib/data/types/Strategy';
+	import type { EntryStrategy, ExitStrategy } from 'base-report-util';
 
+	import { getCombos } from 'base-report-util';
 	import { chartData } from '$lib/store/timeseries';
-	import { getCombos } from './util';
 	import MoveFinderTable from './MoveFinderTable.svelte';
 
 	// TODO: add sort by column

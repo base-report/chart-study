@@ -1,4 +1,4 @@
-import type { Maybe } from '$lib/data/types/Maybes';
+import type { Maybe } from 'base-report-util';
 import type { Widget } from '$lib/data/types/Widget';
 
 type Splitpanes = {

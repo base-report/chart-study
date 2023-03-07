@@ -1,7 +1,7 @@
 import type { TimeseriesDaily } from '$lib/data/decoders/TimeseriesDaily';
-import type { ChartData } from '$lib/data/types/ChartData';
+import type { ChartData } from 'base-report-util';
 import { roundTo } from '$lib/util/number';
-import { getWeek } from '$lib/util/date';
+import { getWeek } from 'base-report-util';
 
 const getChartData = (
 	timeseriesDaily: TimeseriesDaily

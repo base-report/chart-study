@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { ChartData } from '$lib/data/types/ChartData';
+	import type { ChartData } from 'base-report-util';
+
+	import { round } from 'base-report-util';
 	import { selectMove } from '$lib/store/timeseries';
-	import { round } from './util';
 
 	export let combos: ChartData[][];
 </script>

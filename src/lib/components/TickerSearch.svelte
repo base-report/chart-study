@@ -1,8 +1,9 @@
 <script lang="ts">
+	import type { MaybeNumber } from 'base-report-util';
+	import type { SearchResult } from '$lib/data/decoders/SearchResult';
+
 	import { scale } from 'svelte/transition';
 	import { clickOutside } from '$lib/actions/clickOutside';
-	import type { SearchResult } from '$lib/data/decoders/SearchResult';
-	import type { MaybeNumber } from '$lib/data/types/Maybes';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import SearchIcon from '$lib/components/icons/Search.svelte';
 	import { ticker } from '$lib/store/ticker';

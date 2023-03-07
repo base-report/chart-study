@@ -1,9 +1,10 @@
-import { writable, derived, get } from 'svelte/store';
-import { browser } from '$app/environment';
+import type { Maybe } from 'base-report-util';
 import type { Splitpanes, Pane } from '$lib/data/types/Pane';
 import type { SplitDirection } from '$lib/data/types/SplitDirection';
-import type { Maybe } from '$lib/data/types/Maybes';
 import type { Widget } from '$lib/data/types/Widget';
+
+import { writable, derived, get } from 'svelte/store';
+import { browser } from '$app/environment';
 
 const DEFAULT_PANES_TREE: Splitpanes = {
 	type: 'SPLITPANES',

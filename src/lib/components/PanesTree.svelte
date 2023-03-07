@@ -1,7 +1,8 @@
 <script lang="ts">
+	import type { Maybe } from 'base-report-util';
 	import type { Splitpanes as SP_TYPE } from '$lib/data/types/Pane';
 	import type { Widget } from '$lib/data/types/Widget';
-	import type { Maybe } from '$lib/data/types/Maybes';
+
 	import { Splitpanes } from 'svelte-splitpanes';
 	import Pane from '$lib/components/Pane.svelte';
 	import Toolbar from '$lib/components/Toolbar.svelte';

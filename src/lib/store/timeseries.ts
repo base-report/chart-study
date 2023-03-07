@@ -1,5 +1,4 @@
-import type { ChartData, ChartTimeFrame, MarkedMove } from '$lib/data/types/ChartData';
-import type { Maybe } from '$lib/data/types/Maybes';
+import type { ChartData, ChartTimeFrame, MarkedMove, Maybe } from 'base-report-util';
 
 import { get, writable } from 'svelte/store';
 import { ticker } from '$lib/store/ticker';
