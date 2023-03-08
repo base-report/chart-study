@@ -7,6 +7,7 @@ import { fetchTimeseriesIntraday } from '$lib/fmp/timeseriesIntraday';
 export const GET: RequestHandler = async ({ url }) => {
 	const ticker = url.searchParams.get('ticker');
 	const timeframe = url.searchParams.get('timeframe');
+	const from = url.searchParams.get('from');
 	const to = url.searchParams.get('to');
 
 	if (!ticker) {
@@ -17,6 +18,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		const data = await fetchTimeseriesIntraday(
 			ticker,
 			timeframe as IntradayChartTimeFrame,
+			from || undefined,
 			to || undefined
 		);
 		return json(data);

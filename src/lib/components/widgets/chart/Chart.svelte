@@ -32,43 +32,84 @@
 	let init: Function;
 	let dispose: Function;
 	let loadingIntraday = false;
-	let visibleRangeCache = { from: 0, to: 0, more: true };
+	let visibleRangeCache = { from: 0, to: 0 };
+	let intraDayBlacklistDays = {
+		from: new Set<string>(),
+		to: new Set<string>()
+	};
 
-	const fetchIntradayChartData = async (to?: string) => {
-		if (!$ticker || !visibleRangeCache.more) return;
+	const fetchIntradayChartData = async ({
+		from,
+		to,
+		scrollToTarget
+	}: {
+		from?: string;
+		to?: string;
+		scrollToTarget?: boolean;
+	}) => {
+		console.log('fetchIntradayChartData', from, to);
+		console.log('intraDayBlacklistDays', intraDayBlacklistDays);
+		if (from && intraDayBlacklistDays.from.has(from)) return;
+		if (to && intraDayBlacklistDays.to.has(to)) return;
 
 		try {
 			loadingIntraday = true;
-			let endpoint = `/api/chart-data/intraday?ticker=${$ticker}&timeframe=${timeFrame}`;
-			if (to) {
-				endpoint += `&to=${to}`;
+			let path = `/api/chart-data/intraday?ticker=${$ticker}&timeframe=${timeFrame}`;
+			if (from) {
+				path += `&from=${from}`;
 			}
-			const response = await fetch(endpoint);
+			if (to) {
+				path += `&to=${to}`;
+			}
+
+			const response = await fetch(path);
 			const _data = await response.json();
 
-			if (to) {
+			if (from || to) {
 				if (_data[0][5] === data[0][5]) {
-					visibleRangeCache.more = false;
+					if (from) {
+						intraDayBlacklistDays.from.add(from);
+					}
+					if (to) {
+						intraDayBlacklistDays.to.add(to);
+					}
+
 					return;
 				}
 
-				const currentFirstTimestamp = data[0][5];
+				const mergedData = [..._data, ...data];
+				const uniqueTimestamps = new Set<number>();
+				const uniqueData = [];
+				const newTimestamps = _data.map((d) => d[5]);
 				const newData = [];
 
-				for (let i = 0; i < _data.length; i++) {
-					// if timestamp is not the same, add to i position of data
-					if (_data[i][5] < currentFirstTimestamp) {
-						newData.push(_data[i]);
-						data.splice(i, 0, _data[i]);
-					} else {
-						break;
+				for (const d of mergedData) {
+					const timestamp = d[5];
+					if (!uniqueTimestamps.has(timestamp)) {
+						uniqueTimestamps.add(timestamp);
+						uniqueData.push(d);
+
+						if (newTimestamps.includes(timestamp)) {
+							newData.push(d);
+						}
 					}
 				}
 
-				// if there is new data, apply more data
-				if (newData.length) {
-					chart.applyMoreData(
-						newData.map(([open, high, low, close, volume, timestamp]) => ({
+				const hasNewData = uniqueData.length > data.length;
+
+				console.log('hasNewData', hasNewData, newData);
+
+				if (hasNewData) {
+					const visibleRange = getVisibleRange(chart);
+					let scrollToIndex = -1;
+					if (scrollToTarget) {
+						const scrollToTimestamp = from ? _data[0][5] : _data[_data.length - 1][5];
+						scrollToIndex = uniqueData.findIndex((d) => d[5] === scrollToTimestamp);
+					} else {
+						scrollToIndex = visibleRange.to + newData.length;
+					}
+					chart.applyNewData(
+						uniqueData.map(([open, high, low, close, volume, timestamp]) => ({
 							open,
 							high,
 							low,
@@ -77,10 +118,22 @@
 							timestamp
 						}))
 					);
+					if (scrollToIndex > -1) {
+						chart.scrollToDataIndex(scrollToIndex);
+					}
+				} else {
+					if (from) {
+						intraDayBlacklistDays.from.add(from);
+					}
+					if (to) {
+						intraDayBlacklistDays.to.add(to);
+					}
 				}
+
+				data = uniqueData.sort((a, b) => a[5] - b[5]);
+				return newData;
 			} else {
 				data = _data;
-				visibleRangeCache.more = true;
 				updateChart();
 			}
 		} catch (error) {
@@ -90,15 +143,30 @@
 		}
 	};
 
-	const onSelectedMoveChange = () => {
+	const onSelectedMoveChange = async () => {
 		if (!$selectedMove) return;
 		removeEntryAndExit();
-		scrollChart();
+		await scrollChart();
 		addEntryAndExit();
 	};
 
-	const scrollChart = () => {
-		const scrollToIndex = data.findIndex((d) => d[5] === $selectedMove[timeFrame]?.exit[5]);
+	const scrollChart = async () => {
+		// load more data if intraday timeframe
+
+		let scrollToIndex = -1;
+
+		if (isIntraday) {
+			const exitDailyTimestamp = $selectedMove?.daily?.exit[5];
+			if (!exitDailyTimestamp) return;
+			const date = new Date(exitDailyTimestamp);
+			const to = date.toISOString().split('T')[0];
+			const newData = await fetchIntradayChartData({ to });
+			if (newData) {
+				scrollToIndex = data.findIndex((d) => d[5] === newData[newData.length - 1][5]);
+			}
+		} else {
+			scrollToIndex = data.findIndex((d) => d[5] === $selectedMove[timeFrame]?.exit[5]);
+		}
 
 		if (scrollToIndex > -1) {
 			chart.scrollToRealTime();
@@ -179,6 +247,13 @@
 					timestamp
 				}))
 			);
+
+			chart.loadMore(async (timestamp: number) => {
+				console.log('loadMore', timestamp);
+				const date = new Date(timestamp);
+				const isoDateString = date.toISOString().split('T')[0];
+				await fetchIntradayChartData({ to: isoDateString });
+			});
 
 			updateChartIndicators();
 		}, 0);
@@ -295,7 +370,7 @@
 
 	const fetchData = async () => {
 		if (isIntraday) {
-			await fetchIntradayChartData();
+			await fetchIntradayChartData({});
 		} else {
 			await fetchChartData();
 		}
@@ -309,14 +384,44 @@
 
 			if (from === visibleRangeCache.from && to === visibleRangeCache.to) return;
 
-			if (visibleRangeCache.from && visibleRangeCache.to && from === 0) {
-				const date = new Date(data[0][5]);
-				const to = date.toISOString().split('T')[0];
-				await fetchIntradayChartData(to);
+			let direction;
+			if (from > visibleRangeCache.from) {
+				direction = 'draggingToLeft';
+			} else {
+				direction = 'draggingToRight';
 			}
+
+			const visibleRangeData = data.slice(from, to);
+
+			let largestGap: { gapHours: number; timestamp: number } = { gapHours: 0, timestamp: 0 };
+			visibleRangeData.forEach((d, i) => {
+				if (i > 0) {
+					const prevTimestamp = visibleRangeData[i - 1][5];
+					const timestamp = d[5];
+					const gap = timestamp - prevTimestamp;
+					const gapHours = gap / (60 * 60 * 1000);
+					if (gapHours > largestGap.gapHours) {
+						largestGap = { gapHours, timestamp };
+					}
+				}
+			});
+
+			const date = new Date(largestGap.timestamp);
+			const isoDateString = date.toISOString().split('T')[0];
+			let payload: { from?: string; to?: string; scrollToTarget?: boolean } = {
+				scrollToTarget: true
+			};
+			if (direction === 'draggingToRight') {
+				payload.to = isoDateString;
+			} else if (direction === 'draggingToLeft') {
+				payload.from = isoDateString;
+			}
+			await fetchIntradayChartData(payload);
+
 			visibleRangeCache.from = from;
 			visibleRangeCache.to = to;
-		}, 300);
+			clearInterval(visibleRangeWatcher);
+		}, 1000);
 	};
 
 	onDestroy(() => {
@@ -331,7 +436,7 @@
 	$: data = isIntraday ? [] : $chartData[timeFrame];
 
 	$: $ticker && fetchData();
-	$: timeFrame && isIntraday && fetchIntradayChartData();
+	$: timeFrame && isIntraday && fetchIntradayChartData({});
 	$: id && $chartData && updateChart();
 	$: id && indicators && updateChartIndicators();
 	$: chart && $selectedMove && onSelectedMoveChange();

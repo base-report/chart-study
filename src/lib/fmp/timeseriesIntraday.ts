@@ -7,11 +7,16 @@ import { TimeseriesIntradaySchema } from '$lib/data/decoders/TimeseriesIntraday'
 const fetchTimeseriesIntraday = async (
 	ticker: string,
 	timeframe: IntradayChartTimeFrame,
+	from?: string,
 	to?: string
 ): Promise<TimeseriesIntraday> => {
 	let path = `historical-chart/${timeframe}/${ticker}`;
+	if (from) {
+		path += `?from=${from}`;
+	}
 	if (to) {
-		path += `?to=${to}`;
+		const symbol = from ? '&' : '?';
+		path += `${symbol}to=${to}`;
 	}
 
 	const result = await api<TimeseriesIntraday>(path);
