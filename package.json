@@ -19,7 +19,7 @@
 		"@typescript-eslint/eslint-plugin": "^5.53.0",
 		"@typescript-eslint/parser": "^5.53.0",
 		"autoprefixer": "^10.4.13",
-		"base-report-util": "^0.0.17",
+		"base-report-util": "^0.0.14",
 		"codemirror": "^6.0.1",
 		"eslint": "^8.34.0",
 		"eslint-config-prettier": "^8.6.0",

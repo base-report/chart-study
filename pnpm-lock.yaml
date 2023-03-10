@@ -8,7 +8,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.53.0
   '@typescript-eslint/parser': ^5.53.0
   autoprefixer: ^10.4.13
-  base-report-util: ^0.0.17
+  base-report-util: ^0.0.14
   codemirror: ^6.0.1
   eslint: ^8.34.0
   eslint-config-prettier: ^8.6.0
@@ -42,7 +42,7 @@ devDependencies:
   '@typescript-eslint/eslint-plugin': 5.53.0_ny4s7qc6yg74faf3d6xty2ofzy
   '@typescript-eslint/parser': 5.53.0_7kw3g6rralp5ps6mg3uyzz6azm
   autoprefixer: 10.4.13_postcss@8.4.21
-  base-report-util: 0.0.17
+  base-report-util: 0.0.14
   codemirror: 6.0.1
   eslint: 8.34.0
   eslint-config-prettier: 8.6.0_eslint@8.34.0
@@ -750,8 +750,8 @@ packages:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
     dev: true
 
-  /base-report-util/0.0.17:
-    resolution: {integrity: sha512-DNjTBE1aFscnV98kBvWULEEXmTSl0Ug0p4j6Id/+1blKQDFy0J1SJJlH6UZRQ9ZBo0pIj/xjJSGujxtOi1t8Og==}
+  /base-report-util/0.0.14:
+    resolution: {integrity: sha512-vzdOgYb2XhiJL2g41yfL89u6ao4q/b7kkCPQhkLBqGruobO1tuic/2M69U+vXRc4ODEPGnDg2ORitlbtSrraDw==}
     dev: true
 
   /binary-extensions/2.2.0:
