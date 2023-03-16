@@ -67,7 +67,7 @@
 				drawCustomSymbol: ({ ctx, coordinate: { x, y } }) => {
 					ctx.fillStyle = isDark ? '#FFF' : '#000';
 					ctx.font = '13px sans-serif semibold';
-					ctx.fillText('ENTRY', x - 20, y);
+					ctx.fillText('ENTRY', x - 15, y);
 					ctx.fill();
 				}
 			},
