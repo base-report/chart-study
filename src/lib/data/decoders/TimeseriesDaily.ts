@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { parseDate } from '$lib/util/date';
+import { parseDate } from 'base-report-util';
 
 const TimeseriesDailySchema = z
 	.object({
