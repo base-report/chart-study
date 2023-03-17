@@ -22,9 +22,9 @@ For a quick start guide on how to use the tool, please watch the following video
 
 [Financial Modeling Prep](https://site.financialmodelingprep.com/developer) is used as the data provider. You can obtain an API key from their website.
 
-Following are instructions for installing the Chart Study tool locally and on Vercel.
+Following are instructions for installing the Chart Study tool locally (natively and then on Docker) and on Vercel.
 
-### Local
+### Local (native)
 
 #### Prerequisites
 
@@ -48,6 +48,24 @@ pnpm run dev
 # or start the server and open the app in a new browser tab
 pnpm run dev -- --open
 ```
+
+### Local (Docker)
+
+#### Prerequisites
+
+- [Docker](https://www.docker.com)
+
+#### Configure
+
+In `svelte.config.js`, comment out (add `//` in fronte of `import adapter from '@sveltejs/adapter-auto';`) and uncomment the next line (remove `//`)
+
+#### Build the Docker image
+
+docker build . -t chart-study-image
+
+#### Run the Docker container
+
+docker run -d -p 3000:3000 --name chart-study-app chart-study-image
 
 ### Vercel
 
