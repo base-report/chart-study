@@ -57,15 +57,19 @@ pnpm run dev -- --open
 
 #### Configure
 
-In `svelte.config.js`, comment out (add `//` in fronte of `import adapter from '@sveltejs/adapter-auto';`) and uncomment the next line (remove `//`)
+In `svelte.config.js`, comment out (add `//` in fronte of `import adapter from '@sveltejs/adapter-auto';`) and uncomment the next line (remove `//`).
 
 #### Build the Docker image
 
+```bash
 docker build . -t chart-study-image
+```
 
 #### Run the Docker container
 
+```bash
 docker run -d -p 3000:3000 --name chart-study-app chart-study-image
+```
 
 ### Vercel
 
